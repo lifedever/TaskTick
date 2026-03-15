@@ -4,6 +4,7 @@ import SwiftData
 /// Content view displayed in the menu bar popover.
 struct MenuBarView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.openWindow) private var openWindow
     @Query(sort: \ScheduledTask.createdAt, order: .reverse) private var tasks: [ScheduledTask]
     @StateObject private var scheduler = TaskScheduler.shared
 
@@ -60,14 +61,9 @@ struct MenuBarView: View {
                 // Open main window
                 Button(action: {
                     NSApp.setActivationPolicy(.regular)
+                    openWindow(id: "main")
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         NSApp.activate(ignoringOtherApps: true)
-                        for window in NSApp.windows {
-                            if window.canBecomeMain {
-                                window.makeKeyAndOrderFront(nil)
-                                break
-                            }
-                        }
                     }
                 }) {
                     HStack {
