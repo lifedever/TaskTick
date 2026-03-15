@@ -4,210 +4,140 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TaskTick — Scheduled Task Manager for macOS</title>
-<meta name="description" content="A native macOS app for managing scheduled tasks. Cron expressions, script execution, menu bar resident.">
+<meta name="description" content="A native macOS app for managing scheduled tasks. No crontab, no launchd — just TaskTick.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#0a0c14;
-  --bg2:#10131e;
-  --surface:rgba(255,255,255,.03);
-  --surface2:rgba(255,255,255,.05);
-  --border:rgba(255,255,255,.06);
-  --border2:rgba(255,255,255,.1);
-  --text:#eaeaf2;
-  --text2:#7c7e96;
-  --text3:#4a4c60;
-  --accent:#6c8aff;
-  --accent2:#a78bfa;
-  --green:#22c55e;
-  --pink:#e879a8;
-  --radius:16px;
-  --heading:'Space Grotesk','Noto Sans SC',system-ui,sans-serif;
-  --body:'DM Sans','Noto Sans SC',system-ui,sans-serif;
+  --bg:#09090b;
+  --surface:rgba(255,255,255,.04);
+  --border:rgba(255,255,255,.08);
+  --text:#fafafa;
+  --text2:#a1a1aa;
+  --text3:#52525b;
+  --accent:#3b82f6;
+  --font:'Inter','Noto Sans SC',-apple-system,system-ui,sans-serif;
 }
 html{scroll-behavior:smooth;font-size:16px}
-body{font-family:var(--body);background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 ::selection{background:var(--accent);color:#fff}
-h1,h2,h3,h4{font-family:var(--heading)}
 
-/* Ambient background */
-.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.ambient-orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.4}
-.ambient-orb:nth-child(1){width:600px;height:600px;top:-200px;right:-100px;background:rgba(108,138,255,.12);animation:float1 25s ease-in-out infinite}
-.ambient-orb:nth-child(2){width:500px;height:500px;bottom:-150px;left:-80px;background:rgba(167,139,250,.08);animation:float2 30s ease-in-out infinite}
-.ambient-orb:nth-child(3){width:400px;height:400px;top:40%;left:50%;background:rgba(108,138,255,.04);animation:float3 20s ease-in-out infinite}
-@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,30px)}}
-@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,-30px)}}
-@keyframes float3{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,40px)}}
-@media(prefers-reduced-motion:reduce){
-  .ambient-orb{animation:none!important}
-  .reveal{transition:none!important;opacity:1!important;transform:none!important}
-  @keyframes fadeUp{from,to{opacity:1;transform:none}}
-}
-
-.container{max-width:1120px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.container{max-width:1080px;margin:0 auto;padding:0 24px}
 
 /* ── Nav ── */
-nav{position:fixed;top:16px;left:16px;right:16px;z-index:100;backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);background:rgba(10,12,20,.65);border:1px solid var(--border);border-radius:14px;max-width:1120px;margin:0 auto}
-nav .nav-inner{display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px}
-.nav-brand{display:flex;align-items:center;gap:10px;font-family:var(--heading);font-weight:700;font-size:1.05rem;letter-spacing:-.02em;text-decoration:none;color:var(--text);cursor:pointer}
-.nav-brand img{width:28px;height:28px;border-radius:6px}
-.nav-links{display:flex;align-items:center;gap:6px}
-.nav-links a{color:var(--text2);text-decoration:none;font-size:.85rem;font-weight:500;padding:6px 14px;border-radius:8px;transition:color .2s,background .2s;cursor:pointer}
-.nav-links a:hover{color:var(--text);background:var(--surface2)}
-.lang-switch{cursor:pointer;user-select:none;font-size:.78rem;padding:5px 12px;border:1px solid var(--border);border-radius:8px;color:var(--text2);background:transparent;transition:all .2s;font-family:var(--body)}
-.lang-switch:hover{border-color:var(--accent);color:var(--text)}
-.nav-cta{background:var(--accent)!important;color:#fff!important;font-weight:600!important;cursor:pointer}
-.nav-cta:hover{filter:brightness(1.15)!important;background:var(--accent)!important}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(20px) saturate(1.2);-webkit-backdrop-filter:blur(20px) saturate(1.2);background:rgba(9,9,11,.8);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.95rem;letter-spacing:-.02em;text-decoration:none;color:var(--text);cursor:pointer}
+.nav-brand img{width:26px;height:26px;border-radius:6px}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-right a{color:var(--text2);text-decoration:none;font-size:.84rem;font-weight:500;padding:6px 14px;border-radius:8px;transition:color .2s;cursor:pointer}
+.nav-right a:hover{color:var(--text)}
+.lang-switch{cursor:pointer;font-size:.78rem;padding:5px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text3);background:transparent;transition:all .2s;font-family:var(--font)}
+.lang-switch:hover{border-color:var(--text2);color:var(--text2)}
+.nav-cta{background:var(--text)!important;color:var(--bg)!important;font-weight:600!important;border-radius:8px!important;padding:6px 16px!important;cursor:pointer}
+.nav-cta:hover{opacity:.9!important}
 
 /* ── Hero ── */
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:140px 24px 80px}
-.hero-inner{max-width:760px}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 18px 6px 10px;background:var(--surface);border:1px solid var(--border2);border-radius:100px;font-size:.8rem;color:var(--text2);margin-bottom:36px;animation:fadeUp .8s ease both}
-.hero-badge .pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
-.hero-icon{width:110px;height:110px;margin:0 auto 32px;animation:fadeUp .8s ease .05s both}
-.hero-icon img{width:100%;height:100%;border-radius:24px;box-shadow:0 16px 48px rgba(108,138,255,.2),0 0 0 1px rgba(108,138,255,.1)}
-.hero h1{font-size:clamp(2.6rem,6vw,4.5rem);font-weight:700;letter-spacing:-.045em;line-height:1.08;margin-bottom:20px;animation:fadeUp .8s ease .1s both}
-.hero h1 .gradient{background:linear-gradient(135deg,var(--accent),var(--accent2),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero .subtitle{font-size:1.1rem;color:var(--text2);max-width:520px;margin:0 auto 40px;line-height:1.7;animation:fadeUp .8s ease .2s both}
-.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .8s ease .3s both}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:12px;font-size:.9rem;font-weight:600;text-decoration:none;transition:all .2s;cursor:pointer;border:none;font-family:var(--body)}
-.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 20px rgba(108,138,255,.25),inset 0 1px 0 rgba(255,255,255,.15)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(108,138,255,.35),inset 0 1px 0 rgba(255,255,255,.15)}
-.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}
-.btn-secondary:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);transform:translateY(-2px)}
+.hero{padding:160px 24px 80px;text-align:center}
+.hero-inner{max-width:720px;margin:0 auto}
+.hero-icon{margin-bottom:32px}
+.hero-icon img{width:80px;height:80px;border-radius:20px}
+.hero h1{font-size:clamp(2.8rem,6vw,4.2rem);font-weight:700;letter-spacing:-.05em;line-height:1.05;margin-bottom:20px}
+.hero .sub{font-size:1.1rem;color:var(--text2);max-width:480px;margin:0 auto 40px;line-height:1.7}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:10px;font-size:.9rem;font-weight:600;text-decoration:none;transition:all .2s;cursor:pointer;border:none;font-family:var(--font)}
+.btn-primary{background:var(--text);color:var(--bg)}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--text2);color:var(--text);transform:translateY(-1px)}
+.btn svg{width:16px;height:16px}
 
-/* ── Metrics strip ── */
-.metrics{padding:0;position:relative;z-index:1}
-.metrics-inner{display:flex;justify-content:center;gap:1px;max-width:680px;margin:0 auto;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
-.metric{flex:1;text-align:center;padding:28px 16px;background:var(--surface)}
-.metric .value{font-family:var(--heading);font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.metric .label{font-size:.78rem;color:var(--text3);margin-top:4px;letter-spacing:.02em}
-
-/* ── Section common ── */
-section{padding:100px 0}
-.section-label{display:inline-flex;align-items:center;gap:8px;font-family:var(--heading);font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
-.section-label svg{width:16px;height:16px;opacity:.7}
-.section-title{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:700;letter-spacing:-.035em;line-height:1.15;margin-bottom:14px}
-.section-desc{color:var(--text2);font-size:1rem;max-width:520px;line-height:1.7}
+/* ── Screenshot ── */
+.screenshot{padding:0 24px 100px;text-align:center}
+.screenshot img{width:100%;max-width:960px;border-radius:12px;border:1px solid var(--border);box-shadow:0 32px 80px rgba(0,0,0,.5)}
 
 /* ── Features ── */
-.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:48px}
-.feature-card{padding:28px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);transition:border-color .25s,box-shadow .25s,transform .25s;position:relative;overflow:hidden;cursor:default}
-.feature-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(108,138,255,.2),transparent);opacity:0;transition:opacity .3s}
-.feature-card:hover{border-color:rgba(108,138,255,.12);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.25)}
-.feature-card:hover::after{opacity:1}
-.feature-icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;margin-bottom:16px;background:rgba(108,138,255,.08);border:1px solid rgba(108,138,255,.1);color:var(--accent)}
-.feature-icon svg{width:20px;height:20px}
-.feature-card h3{font-size:1rem;font-weight:600;margin-bottom:8px;letter-spacing:-.01em}
-.feature-card p{font-size:.88rem;color:var(--text2);line-height:1.6}
+.features{padding:100px 0;border-top:1px solid var(--border)}
+.features-header{text-align:center;margin-bottom:64px}
+.features-header h2{font-size:clamp(1.8rem,4vw,2.4rem);font-weight:700;letter-spacing:-.04em;margin-bottom:12px}
+.features-header p{color:var(--text2);font-size:1rem;max-width:460px;margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.feature-card{padding:36px 28px;background:var(--bg);transition:background .3s}
+.feature-card:hover{background:rgba(255,255,255,.02)}
+.feature-icon{color:var(--text3);margin-bottom:16px}
+.feature-icon svg{width:22px;height:22px}
+.feature-card h3{font-size:.95rem;font-weight:600;margin-bottom:8px;letter-spacing:-.01em}
+.feature-card p{font-size:.85rem;color:var(--text2);line-height:1.65}
 
-/* ── Steps ── */
-.steps-section{text-align:center;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px;position:relative}
-.steps-grid::before{content:'';position:absolute;top:38px;left:calc(33.33% - 40px);right:calc(33.33% - 40px);height:1px;background:linear-gradient(90deg,var(--border),var(--accent),var(--border));opacity:.4}
-.step-card{padding:32px 24px;border-radius:var(--radius);background:var(--bg);border:1px solid var(--border);position:relative}
-.step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--heading);font-weight:700;font-size:.85rem;margin:0 auto 18px;position:relative;z-index:1}
-.step-card h3{font-size:.95rem;font-weight:600;margin-bottom:8px}
-.step-card p{font-size:.85rem;color:var(--text2);line-height:1.6}
-
-/* ── Terminal preview ── */
-.terminal-section{overflow:hidden}
-.terminal-layout{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:48px}
-.terminal-text{text-align:left}
-.terminal-text h3{font-size:1.2rem;font-weight:600;margin-bottom:12px}
-.terminal-text p{font-size:.92rem;color:var(--text2);line-height:1.7;margin-bottom:20px}
-.terminal-text ul{list-style:none;display:flex;flex-direction:column;gap:10px}
-.terminal-text li{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--text2)}
-.terminal-text li svg{width:16px;height:16px;color:var(--green);flex-shrink:0}
-.terminal-window{border-radius:14px;overflow:hidden;border:1px solid var(--border2);background:var(--bg2);box-shadow:0 24px 64px rgba(0,0,0,.35)}
-.terminal-header{display:flex;align-items:center;gap:8px;padding:14px 16px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border)}
-.terminal-dot{width:10px;height:10px;border-radius:50%}
-.terminal-dot.r{background:#ff5f57}.terminal-dot.y{background:#febc2e}.terminal-dot.g{background:#28c840}
-.terminal-title{flex:1;text-align:center;font-size:.72rem;color:var(--text3);font-family:'SF Mono',Menlo,monospace}
-.terminal-body{padding:20px;font-family:'SF Mono',Menlo,monospace;font-size:.78rem;line-height:1.8;color:var(--text2)}
-.terminal-body .prompt{color:var(--green)}
-.terminal-body .cmd{color:var(--text)}
-.terminal-body .comment{color:var(--text3)}
-.terminal-body .output{color:var(--accent)}
-.terminal-body .success{color:var(--green)}
+/* ── Install ── */
+.install{padding:100px 0;border-top:1px solid var(--border);text-align:center}
+.install h2{font-size:clamp(1.8rem,4vw,2.4rem);font-weight:700;letter-spacing:-.04em;margin-bottom:40px}
+.install-methods{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;max-width:640px;margin:0 auto}
+.install-card{flex:1;min-width:280px;padding:32px;border-radius:12px;border:1px solid var(--border);background:var(--surface);text-align:left}
+.install-card .label{font-size:.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px}
+.install-card code{display:block;font-family:'SF Mono',Menlo,monospace;font-size:.82rem;line-height:1.8;color:var(--text2);word-break:break-all}
+.install-card code span{color:var(--accent)}
 
 /* ── CTA ── */
-.cta-section{text-align:center;padding:80px 0 120px}
-.cta-card{padding:64px 48px;border-radius:24px;background:linear-gradient(135deg,rgba(108,138,255,.05),rgba(167,139,250,.03));border:1px solid rgba(108,138,255,.08);position:relative;overflow:hidden}
-.cta-card::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(108,138,255,.08),transparent 70%);pointer-events:none}
-.cta-card::after{content:'';position:absolute;bottom:-60px;left:-60px;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.06),transparent 70%);pointer-events:none}
-.cta-card>*{position:relative;z-index:1}
-.cta-card h2{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:700;letter-spacing:-.03em;margin-bottom:10px}
-.cta-card .subtitle{color:var(--text2);margin-bottom:32px;font-size:.95rem}
+.cta{padding:120px 0;text-align:center}
+.cta h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;letter-spacing:-.04em;margin-bottom:12px}
+.cta .sub{color:var(--text2);margin-bottom:36px;font-size:.95rem}
 .cta-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.btn-sponsor{border-color:rgba(232,121,168,.15)!important;color:var(--pink)!important}
-.btn-sponsor:hover{border-color:rgba(232,121,168,.3)!important;background:rgba(232,121,168,.06)!important}
+.btn-sponsor{color:#f472b6!important;border-color:rgba(244,114,182,.15)!important}
+.btn-sponsor:hover{border-color:rgba(244,114,182,.3)!important;background:rgba(244,114,182,.04)!important}
 
 /* ── Footer ── */
-footer{border-top:1px solid var(--border);padding:28px 0}
-footer .container{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
-footer .left{font-size:.82rem;color:var(--text3)}
-footer .left a{color:var(--text2);text-decoration:none;transition:color .2s}
+footer{border-top:1px solid var(--border);padding:24px 0}
+footer .container{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer .left{font-size:.8rem;color:var(--text3)}
+footer .left a{color:var(--text2);text-decoration:none}
 footer .left a:hover{color:var(--text)}
 footer .right{display:flex;gap:20px}
-footer .right a{color:var(--text3);text-decoration:none;font-size:.82rem;transition:color .2s}
+footer .right a{color:var(--text3);text-decoration:none;font-size:.8rem}
 footer .right a:hover{color:var(--text)}
 
 /* ── Animations ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.reveal{opacity:0;transform:translateY(24px);transition:all .6s cubic-bezier(.22,1,.36,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .6s ease both}
+.fade-d1{animation-delay:.1s}.fade-d2{animation-delay:.2s}.fade-d3{animation-delay:.3s}.fade-d4{animation-delay:.4s}
+.reveal{opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.22,1,.36,1)}
 .reveal.visible{opacity:1;transform:translateY(0)}
-.reveal-d1{transition-delay:.08s}.reveal-d2{transition-delay:.16s}.reveal-d3{transition-delay:.24s}.reveal-d4{transition-delay:.32s}
+
+@media(prefers-reduced-motion:reduce){
+  .reveal,.fade-in{animation:none!important;transition:none!important;opacity:1!important;transform:none!important}
+}
 
 /* ── Responsive ── */
 @media(max-width:768px){
-  nav{top:8px;left:8px;right:8px}
-  .hero{min-height:auto;padding:110px 20px 60px}
+  .hero{padding:120px 20px 60px}
   .hero h1{font-size:2.2rem}
   .features-grid{grid-template-columns:1fr}
-  .steps-grid{grid-template-columns:1fr;gap:14px}
-  .steps-grid::before{display:none}
-  .terminal-layout{grid-template-columns:1fr;gap:32px}
-  .terminal-text{text-align:center}
-  .cta-card{padding:40px 20px}
-  .metrics-inner{flex-direction:column;gap:0}
-  .metric{border-bottom:1px solid var(--border)}
-  .metric:last-child{border-bottom:none}
-  .nav-links a:not(.nav-cta):not(.lang-switch){display:none}
+  .install-methods{flex-direction:column}
+  .install-card{min-width:0}
+  .nav-right a:not(.nav-cta):not(.lang-switch){display:none}
   footer .container{flex-direction:column;text-align:center}
 }
 @media(max-width:480px){
   .hero h1{font-size:1.9rem}
-  .hero .subtitle{font-size:.95rem}
   .btn{padding:11px 22px;font-size:.85rem}
 }
 
 /* ── Light mode ── */
 @media(prefers-color-scheme:light){
   :root{
-    --bg:#f7f8fc;--bg2:#fff;
-    --surface:rgba(0,0,0,.02);--surface2:rgba(0,0,0,.04);
-    --border:rgba(0,0,0,.06);--border2:rgba(0,0,0,.1);
-    --text:#111827;--text2:#6b7280;--text3:#9ca3af;
-    --accent:#4f6ef7;--accent2:#7c5cf7;
+    --bg:#ffffff;--surface:rgba(0,0,0,.02);
+    --border:rgba(0,0,0,.08);
+    --text:#09090b;--text2:#71717a;--text3:#a1a1aa;
+    --accent:#2563eb;
   }
-  nav{background:rgba(247,248,252,.75)}
-  .ambient-orb:nth-child(1){background:rgba(79,110,247,.06)}
-  .ambient-orb:nth-child(2){background:rgba(124,92,247,.04)}
-  .ambient-orb:nth-child(3){background:rgba(79,110,247,.03)}
-  .hero-icon img{box-shadow:0 16px 48px rgba(79,110,247,.12),0 0 0 1px rgba(79,110,247,.08)}
-  .feature-card:hover{box-shadow:0 8px 32px rgba(0,0,0,.06)}
-  .btn-primary{box-shadow:0 4px 20px rgba(79,110,247,.2),inset 0 1px 0 rgba(255,255,255,.2)}
-  .terminal-window{box-shadow:0 24px 64px rgba(0,0,0,.08);background:#1e1e2e;border-color:rgba(0,0,0,.15)}
-  .terminal-header{background:rgba(0,0,0,.3)}
-  .terminal-body{color:#a0a0b8}
-  .steps-section{background:var(--bg2)}
-  .hero-screenshot img{box-shadow:0 24px 64px rgba(0,0,0,.08)!important}
+  nav{background:rgba(255,255,255,.8)}
+  .btn-primary{background:var(--text);color:#fff}
+  .screenshot img{box-shadow:0 32px 80px rgba(0,0,0,.1)}
+  .feature-card:hover{background:rgba(0,0,0,.01)}
+  .install-card{background:rgba(0,0,0,.02)}
+  .install-card code{color:#374151}
 }
 
 /* ── i18n ── */
@@ -216,11 +146,6 @@ footer .right a:hover{color:var(--text)}
 </style>
 </head>
 <body data-lang="en">
-<div class="ambient">
-  <div class="ambient-orb"></div>
-  <div class="ambient-orb"></div>
-  <div class="ambient-orb"></div>
-</div>
 
 <!-- Nav -->
 <nav>
@@ -229,12 +154,13 @@ footer .right a:hover{color:var(--text)}
       <img src="icon.svg" alt="TaskTick">
       TaskTick
     </a>
-    <div class="nav-links">
+    <div class="nav-right">
       <a href="#features" data-i18n-en>Features</a><a href="#features" data-i18n-zh>功能</a>
-      <a href="#how" data-i18n-en>How It Works</a><a href="#how" data-i18n-zh>使用方式</a>
-      <a href="#preview" data-i18n-en>Preview</a><a href="#preview" data-i18n-zh>预览</a>
-      <button class="lang-switch" onclick="toggleLang()">中文 / EN</button>
-      <a href="https://github.com/lifedever/TaskTick" class="nav-cta">GitHub</a>
+      <a href="#install" data-i18n-en>Install</a><a href="#install" data-i18n-zh>安装</a>
+      <button class="lang-switch" onclick="toggleLang()">中 / EN</button>
+      <a href="https://github.com/lifedever/TaskTick/releases" class="nav-cta">
+        <span data-i18n-en>Download</span><span data-i18n-zh>下载</span>
+      </a>
     </div>
   </div>
 </nav>
@@ -242,257 +168,114 @@ footer .right a:hover{color:var(--text)}
 <!-- Hero -->
 <section class="hero">
   <div class="hero-inner">
-    <div class="hero-badge">
-      <span class="pulse-dot"></span>
-      <span data-i18n-en>macOS Native · SwiftUI + SwiftData</span>
-      <span data-i18n-zh>macOS 原生 · SwiftUI + SwiftData</span>
-    </div>
-    <div class="hero-icon"><img src="icon.svg" alt="TaskTick"></div>
-    <h1 data-i18n-en>Schedule tasks,<br><span class="gradient">not headaches.</span></h1>
-    <h1 data-i18n-zh>定时任务，<br><span class="gradient">轻松掌控。</span></h1>
-    <p class="subtitle" data-i18n-en>A beautiful, native macOS app for managing scheduled tasks. No crontab editing. No launchd configs. Just create, schedule, and let TaskTick handle the rest.</p>
-    <p class="subtitle" data-i18n-zh>一款精美的 macOS 原生定时任务管理应用。无需编辑 crontab，无需配置 launchd。创建、调度，剩下的交给 TaskTick。</p>
-    <div class="hero-actions">
+    <div class="hero-icon fade-in"><img src="icon.svg" alt="TaskTick"></div>
+    <h1 class="fade-in fade-d1" data-i18n-en>Schedule tasks,<br>not headaches.</h1>
+    <h1 class="fade-in fade-d1" data-i18n-zh>定时任务，<br>轻松掌控。</h1>
+    <p class="sub fade-in fade-d2" data-i18n-en>A native macOS app for managing scheduled tasks. No crontab. No launchd. Just create, schedule, and forget.</p>
+    <p class="sub fade-in fade-d2" data-i18n-zh>macOS 原生定时任务管理。无需 crontab，无需 launchd。创建、调度，然后忘掉它。</p>
+    <div class="hero-actions fade-in fade-d3">
       <a href="https://github.com/lifedever/TaskTick/releases" class="btn btn-primary">
-        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span data-i18n-en>Download</span><span data-i18n-zh>下载</span>
+        <span data-i18n-en>Download for macOS</span><span data-i18n-zh>下载 macOS 版</span>
       </a>
-      <a href="https://github.com/lifedever/TaskTick" class="btn btn-secondary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-        <span data-i18n-en>View Source</span><span data-i18n-zh>查看源码</span>
+      <a href="https://github.com/lifedever/TaskTick" class="btn btn-ghost">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
       </a>
-    </div>
-    <div class="hero-screenshot" style="margin-top:48px;animation:fadeUp .8s ease .4s both">
-      <img src="https://cdn.jsdelivr.net/gh/lifedever/images@master/uPic/2026/03/CS2026-03-15-22.51.43@2x.png" alt="TaskTick Screenshot" style="width:100%;max-width:860px;border-radius:14px;border:1px solid var(--border2);box-shadow:0 24px 64px rgba(0,0,0,.35)">
     </div>
   </div>
 </section>
 
-<!-- Metrics -->
-<div class="metrics reveal">
-  <div class="container">
-    <div class="metrics-inner">
-      <div class="metric">
-        <div class="value">100%</div>
-        <div class="label" data-i18n-en>Native macOS</div><div class="label" data-i18n-zh>原生 macOS</div>
-      </div>
-      <div class="metric">
-        <div class="value">2</div>
-        <div class="label" data-i18n-en>Languages</div><div class="label" data-i18n-zh>支持语言</div>
-      </div>
-      <div class="metric">
-        <div class="value">0</div>
-        <div class="label" data-i18n-en>Dependencies</div><div class="label" data-i18n-zh>外部依赖</div>
-      </div>
-      <div class="metric">
-        <div class="value">MIT</div>
-        <div class="label" data-i18n-en>Open Source</div><div class="label" data-i18n-zh>开源协议</div>
-      </div>
-    </div>
-  </div>
+<!-- Screenshot -->
+<div class="screenshot fade-in fade-d4">
+  <img src="https://cdn.jsdelivr.net/gh/lifedever/images@master/uPic/2026/03/CS2026-03-15-22.51.43@2x.png" alt="TaskTick Screenshot">
 </div>
 
 <!-- Features -->
-<section id="features">
+<section id="features" class="features">
   <div class="container">
-    <div class="reveal">
-      <div class="section-label">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <span data-i18n-en>Features</span><span data-i18n-zh>功能特色</span>
-      </div>
-      <h2 class="section-title" data-i18n-en>Everything you need.<br>Nothing you don't.</h2>
-      <h2 class="section-title" data-i18n-zh>你需要的全都有，<br>不需要的一个没有。</h2>
-      <p class="section-desc" data-i18n-en>Built for developers who want scheduled tasks without the complexity of system daemons.</p>
-      <p class="section-desc" data-i18n-zh>为不想折腾系统守护进程的开发者而生。</p>
+    <div class="features-header reveal">
+      <h2 data-i18n-en>Everything you need.</h2>
+      <h2 data-i18n-zh>你需要的，都在这里。</h2>
+      <p data-i18n-en>Built for developers who want scheduled tasks without the complexity.</p>
+      <p data-i18n-zh>为不想折腾系统守护进程的开发者而生。</p>
     </div>
-    <div class="features-grid">
-      <!-- Menu Bar -->
-      <div class="feature-card reveal reveal-d1">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><circle cx="7" cy="6" r=".5" fill="currentColor"/><circle cx="10" cy="6" r=".5" fill="currentColor"/></svg>
-        </div>
+    <div class="features-grid reveal">
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg></div>
         <h3 data-i18n-en>Menu Bar Resident</h3><h3 data-i18n-zh>菜单栏常驻</h3>
-        <p data-i18n-en>Lives in your menu bar, always running in the background. Close the main window — TaskTick keeps working quietly.</p>
-        <p data-i18n-zh>常驻菜单栏，后台静默运行。关闭主窗口也不影响任务执行。</p>
+        <p data-i18n-en>Runs silently in background. Close the window, tasks keep running.</p>
+        <p data-i18n-zh>后台静默运行，关闭窗口也不影响任务执行。</p>
       </div>
-      <!-- Cron -->
-      <div class="feature-card reveal reveal-d2">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
-        <h3 data-i18n-en>Cron & Interval Scheduling</h3><h3 data-i18n-zh>Cron 表达式 & 固定间隔</h3>
-        <p data-i18n-en>Full cron expression support with visual presets and human-readable preview. Or set simple fixed intervals.</p>
-        <p data-i18n-zh>完整的 Cron 表达式支持，内置可视化预设和可读预览。也可设置固定间隔。</p>
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <h3 data-i18n-en>Flexible Scheduling</h3><h3 data-i18n-zh>灵活调度</h3>
+        <p data-i18n-en>Date, time, repeat cycles — intuitive UI like Reminders.</p>
+        <p data-i18n-zh>日期、时间、重复周期，类似提醒事项的直觉体验。</p>
       </div>
-      <!-- Script -->
-      <div class="feature-card reveal reveal-d1">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-        </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
         <h3 data-i18n-en>Script Execution</h3><h3 data-i18n-zh>脚本执行</h3>
-        <p data-i18n-en>Write scripts inline or select local files — .sh, .py, .rb, .js and more. Choose your shell, set working directory.</p>
-        <p data-i18n-zh>支持内联脚本或选择本地文件 — .sh、.py、.rb、.js 等。自由选择 Shell 和工作目录。</p>
+        <p data-i18n-en>Bash, Python, Ruby, Node.js — inline or from file.</p>
+        <p data-i18n-zh>Bash、Python、Ruby、Node.js — 内联或文件。</p>
       </div>
-      <!-- Logs -->
-      <div class="feature-card reveal reveal-d2">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
         <h3 data-i18n-en>Execution Logs</h3><h3 data-i18n-zh>执行日志</h3>
-        <p data-i18n-en>Every run is logged — stdout, stderr, exit codes, and duration. Filter by status, browse history with full context.</p>
-        <p data-i18n-zh>每次执行自动记录 — 标准输出、错误输出、退出码、耗时。支持状态筛选。</p>
+        <p data-i18n-en>stdout, stderr, exit codes, duration — all captured.</p>
+        <p data-i18n-zh>标准输出、错误、退出码、耗时 — 全部记录。</p>
       </div>
-      <!-- Notifications -->
-      <div class="feature-card reveal reveal-d1">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-        </div>
-        <h3 data-i18n-en>System Notifications</h3><h3 data-i18n-zh>系统通知</h3>
-        <p data-i18n-en>Get macOS native notifications on task success or failure. Configure per task — only hear about what matters.</p>
-        <p data-i18n-zh>任务成功或失败时推送 macOS 原生通知。支持按任务独立配置。</p>
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+        <h3 data-i18n-en>Notifications</h3><h3 data-i18n-zh>系统通知</h3>
+        <p data-i18n-en>macOS native alerts on success or failure, per task.</p>
+        <p data-i18n-zh>任务成功或失败时推送 macOS 原生通知。</p>
       </div>
-      <!-- i18n -->
-      <div class="feature-card reveal reveal-d2">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-        </div>
-        <h3 data-i18n-en>Bilingual: EN & 中文</h3><h3 data-i18n-zh>中英双语</h3>
-        <p data-i18n-en>Full English and Simplified Chinese interface. Switch instantly or follow your system preference.</p>
-        <p data-i18n-zh>完整的中英文界面，App 内一键切换语言，或跟随系统偏好。</p>
-      </div>
-      <!-- Auto Update -->
-      <div class="feature-card reveal reveal-d1">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-        </div>
-        <h3 data-i18n-en>Auto Updates</h3><h3 data-i18n-zh>自动更新</h3>
-        <p data-i18n-en>Automatically checks GitHub Releases for new versions. Get notified and download updates with one click.</p>
-        <p data-i18n-zh>自动检查 GitHub Releases 上的新版本，发现更新时提醒并一键下载。</p>
-      </div>
-      <!-- Liquid Glass -->
-      <div class="feature-card reveal reveal-d2">
-        <div class="feature-icon" style="background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.1);color:var(--accent2)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/><circle cx="12" cy="12" r="4"/></svg>
-        </div>
-        <h3 data-i18n-en>macOS 26 Liquid Glass</h3><h3 data-i18n-zh>macOS 26 液态玻璃</h3>
-        <p data-i18n-en>Supports the new liquid glass visual effects on macOS 26 with graceful fallbacks for older systems.</p>
-        <p data-i18n-zh>支持 macOS 26 全新液态玻璃视觉特效，旧系统优雅降级。</p>
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+        <h3 data-i18n-en>EN & 中文</h3><h3 data-i18n-zh>中英双语</h3>
+        <p data-i18n-en>Full bilingual interface, switch anytime.</p>
+        <p data-i18n-zh>完整中英文界面，一键切换。</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- How It Works -->
-<section id="how" class="steps-section">
+<!-- Install -->
+<section id="install" class="install">
   <div class="container">
-    <div class="reveal">
-      <div class="section-label" style="justify-content:center">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span data-i18n-en>How It Works</span><span data-i18n-zh>使用方式</span>
+    <h2 class="reveal" data-i18n-en>Get started in seconds.</h2>
+    <h2 class="reveal" data-i18n-zh>几秒钟即可开始。</h2>
+    <div class="install-methods reveal">
+      <div class="install-card">
+        <div class="label">Homebrew</div>
+        <code><span>brew</span> tap lifedever/tap<br><span>brew</span> install --cask task-tick</code>
       </div>
-      <h2 class="section-title" style="text-align:center" data-i18n-en>Three steps to automation</h2>
-      <h2 class="section-title" style="text-align:center" data-i18n-zh>三步开启自动化</h2>
-    </div>
-    <div class="steps-grid">
-      <div class="step-card reveal reveal-d1">
-        <div class="step-num">1</div>
-        <h3 data-i18n-en>Create a Task</h3><h3 data-i18n-zh>创建任务</h3>
-        <p data-i18n-en>Give it a name, write your script or pick a file, choose a shell.</p>
-        <p data-i18n-zh>起个名字，编写脚本或选择文件，选择 Shell。</p>
-      </div>
-      <div class="step-card reveal reveal-d2">
-        <div class="step-num">2</div>
-        <h3 data-i18n-en>Set a Schedule</h3><h3 data-i18n-zh>设定调度</h3>
-        <p data-i18n-en>Pick a cron preset, write a custom expression, or set a fixed interval.</p>
-        <p data-i18n-zh>选择 Cron 预设、自定义表达式，或设定固定间隔。</p>
-      </div>
-      <div class="step-card reveal reveal-d3">
-        <div class="step-num">3</div>
-        <h3 data-i18n-en>Let It Run</h3><h3 data-i18n-zh>自动运行</h3>
-        <p data-i18n-en>TaskTick runs tasks on schedule, logs results, and notifies you.</p>
-        <p data-i18n-zh>TaskTick 按时执行任务，记录结果，通知你。就这么简单。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Terminal Preview -->
-<section id="preview" class="terminal-section">
-  <div class="container">
-    <div class="terminal-layout">
-      <div class="terminal-text reveal">
-        <div class="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-          <span data-i18n-en>Preview</span><span data-i18n-zh>预览</span>
-        </div>
-        <h3 data-i18n-en>Your scripts, your schedule</h3>
-        <h3 data-i18n-zh>你的脚本，你的时间表</h3>
-        <p data-i18n-en>TaskTick supports any script that runs in a shell. Write inline or point to a file — it handles execution, logging, and notifications automatically.</p>
-        <p data-i18n-zh>TaskTick 支持任何能在 Shell 中运行的脚本。内联编写或指向文件 — 自动执行、记录和通知。</p>
-        <ul>
-          <li>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span data-i18n-en>Bash, Python, Ruby, Node.js, and more</span><span data-i18n-zh>Bash、Python、Ruby、Node.js 等</span>
-          </li>
-          <li>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span data-i18n-en>Capture stdout, stderr, and exit codes</span><span data-i18n-zh>捕获标准输出、错误输出和退出码</span>
-          </li>
-          <li>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span data-i18n-en>Custom working directory per task</span><span data-i18n-zh>每个任务可自定义工作目录</span>
-          </li>
-          <li>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span data-i18n-en>Notification on success or failure</span><span data-i18n-zh>成功或失败时通知</span>
-          </li>
-        </ul>
-      </div>
-      <div class="reveal reveal-d2">
-        <div class="terminal-window">
-          <div class="terminal-header">
-            <span class="terminal-dot r"></span>
-            <span class="terminal-dot y"></span>
-            <span class="terminal-dot g"></span>
-            <span class="terminal-title">TaskTick — backup-db</span>
-          </div>
-          <div class="terminal-body">
-            <div><span class="comment"># Task: backup-db</span></div>
-            <div><span class="comment"># Schedule: 0 2 * * * (daily at 2:00 AM)</span></div>
-            <div><span class="comment"># Shell: /bin/bash</span></div>
-            <div style="margin-top:8px"><span class="prompt">$ </span><span class="cmd">pg_dump -h localhost mydb > /backups/db_$(date +%Y%m%d).sql</span></div>
-            <div style="margin-top:8px"><span class="output">[2026-03-15 02:00:01]</span> <span class="success">Task started</span></div>
-            <div><span class="output">[2026-03-15 02:00:03]</span> Dumping database "mydb"...</div>
-            <div><span class="output">[2026-03-15 02:00:08]</span> Written 24.3 MB to /backups/db_20260315.sql</div>
-            <div><span class="output">[2026-03-15 02:00:08]</span> <span class="success">Exit code: 0 (success)</span></div>
-            <div><span class="output">[2026-03-15 02:00:08]</span> <span class="success">Duration: 7.2s</span></div>
-          </div>
-        </div>
+      <div class="install-card">
+        <div class="label" data-i18n-en>Manual Download</div>
+        <div class="label" data-i18n-zh>手动下载</div>
+        <code data-i18n-en>Download <span>.dmg</span> from<br><a href="https://github.com/lifedever/TaskTick/releases" style="color:var(--accent);text-decoration:none">GitHub Releases</a></code>
+        <code data-i18n-zh>从 <a href="https://github.com/lifedever/TaskTick/releases" style="color:var(--accent);text-decoration:none">GitHub Releases</a><br>下载 <span>.dmg</span> 安装包</code>
       </div>
     </div>
   </div>
 </section>
 
 <!-- CTA -->
-<section class="cta-section">
+<section class="cta">
   <div class="container">
-    <div class="cta-card reveal">
-      <h2 data-i18n-en>Ready to automate?</h2>
-      <h2 data-i18n-zh>准备好自动化了吗？</h2>
-      <p class="subtitle" data-i18n-en>Open source. Free forever. Built with SwiftUI & SwiftData.</p>
-      <p class="subtitle" data-i18n-zh>开源免费，基于 SwiftUI & SwiftData 构建。</p>
+    <div class="reveal">
+      <h2 data-i18n-en>Open source. Free forever.</h2>
+      <h2 data-i18n-zh>开源免费，永久使用。</h2>
+      <p class="sub" data-i18n-en>Built with SwiftUI & SwiftData. GPL-3.0 licensed.</p>
+      <p class="sub" data-i18n-zh>基于 SwiftUI & SwiftData 构建。GPL-3.0 开源协议。</p>
       <div class="cta-actions">
-        <a href="https://github.com/lifedever/TaskTick/releases" class="btn btn-primary">
-          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span data-i18n-en>Download Latest</span><span data-i18n-zh>下载最新版</span>
-        </a>
-        <a href="https://github.com/lifedever/TaskTick" class="btn btn-secondary">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        <a href="https://github.com/lifedever/TaskTick" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
           Star on GitHub
         </a>
-        <a href="https://lifedever.github.io/sponsor/" class="btn btn-secondary btn-sponsor">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-          <span data-i18n-en>Sponsor</span><span data-i18n-zh>赞助支持</span>
+        <a href="https://lifedever.github.io/sponsor/" class="btn btn-ghost btn-sponsor">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span data-i18n-en>Sponsor</span><span data-i18n-zh>赞助</span>
         </a>
       </div>
     </div>
@@ -501,11 +284,10 @@ footer .right a:hover{color:var(--text)}
 
 <footer>
   <div class="container">
-    <div class="left">&copy; 2026 <a href="https://github.com/lifedever">lifedever</a> &middot; MIT License</div>
+    <div class="left">&copy; 2026 <a href="https://github.com/lifedever">lifedever</a> &middot; GPL-3.0</div>
     <div class="right">
       <a href="https://github.com/lifedever/TaskTick">GitHub</a>
       <a href="https://github.com/lifedever/TaskTick/issues">Issues</a>
-      <a href="https://lifedever.github.io/sponsor/">Sponsor</a>
     </div>
   </div>
 </footer>
@@ -520,13 +302,6 @@ const observer=new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}})
 },{threshold:0.08});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-
-document.querySelectorAll('a[href^="#"]').forEach(a=>{
-  a.addEventListener('click',e=>{
-    const t=document.querySelector(a.getAttribute('href'));
-    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'})}
-  })
-});
 </script>
 </body>
 </html>
