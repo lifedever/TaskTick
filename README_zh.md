@@ -21,7 +21,7 @@
 ---
 
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/lifedever/images@master/uPic/2026/03/CS2026-03-15-21.30.43@2x.png" width="800" alt="TaskTick 截图">
+  <img src="https://cdn.jsdelivr.net/gh/lifedever/images@master/uPic/2026/03/CS2026-03-15-22.51.43@2x.png" width="800" alt="TaskTick 截图">
 </p>
 
 ## 功能特色
