@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>TaskTick Dev</string>
+    <string>TaskTick</string>
     <key>CFBundleDisplayName</key>
-    <string>TaskTick Dev</string>
+    <string>TaskTick</string>
     <key>CFBundleIdentifier</key>
-    <string>com.lifedever.TaskTick.dev</string>
+    <string>com.lifedever.TaskTick</string>
     <key>CFBundleVersion</key>
-    <string>dev.202603152309</string>
+    <string>202603152309</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.0.0-dev</string>
+    <string>1.0.3</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleExecutable</key>
@@ -28,6 +28,8 @@
     <string>15.0</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.developer-tools</string>
+    <key>NSMainStoryboardFile</key>
+    <string></string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
     <key>NSSupportsAutomaticTermination</key>

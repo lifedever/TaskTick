@@ -261,7 +261,10 @@ struct UpdateDialogView: View {
                 Spacer()
                 if updater.downloadComplete {
                     Button(L10n.tr("update.install_restart")) {
-                        updater.installAndRestart()
+                        dismiss()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            updater.installAndRestart()
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                     .pointerCursor()

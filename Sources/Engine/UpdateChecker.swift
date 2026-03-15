@@ -149,69 +149,56 @@ final class UpdateChecker: ObservableObject {
         guard let fileURL = downloadedFileURL else { return }
 
         let destApp = Bundle.main.bundlePath
-        let filePath = fileURL.path
+        let dmgPath = fileURL.path
 
-        Task.detached {
-            do {
-                // Mount the DMG
-                let process = Process()
-                process.executableURL = URL(fileURLWithPath: "/usr/bin/hdiutil")
-                process.arguments = ["attach", filePath, "-nobrowse", "-noverify"]
-                let pipe = Pipe()
-                process.standardOutput = pipe
-                try process.run()
-                process.waitUntilExit()
+        // Use a single shell script to handle the entire update process
+        // This avoids Swift-side hdiutil output parsing issues
+        let script = """
+        #!/bin/bash
+        DMG_PATH="\(dmgPath)"
+        DEST_APP="\(destApp)"
+        APP_NAME="TaskTick"
 
-                let output = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+        # Mount DMG and capture mount point
+        MOUNT_POINT=$(hdiutil attach "$DMG_PATH" -nobrowse -noverify 2>/dev/null | grep -o '/Volumes/[^\t]*' | head -1)
 
-                // Find the mount point
-                let lines = output.components(separatedBy: "\n")
-                guard let mountLine = lines.last(where: { $0.contains("/Volumes/") }),
-                      let mountPoint = mountLine.components(separatedBy: "\t").last?.trimmingCharacters(in: .whitespaces) else {
-                    await MainActor.run { NSWorkspace.shared.open(fileURL) }
-                    return
-                }
+        if [ -z "$MOUNT_POINT" ]; then
+            open "$DMG_PATH"
+            exit 1
+        fi
 
-                // Find .app in mounted volume
-                let appName = "TaskTick.app"
-                let sourceApp = "\(mountPoint)/\(appName)"
+        SOURCE_APP="$MOUNT_POINT/$APP_NAME.app"
 
-                guard FileManager.default.fileExists(atPath: sourceApp) else {
-                    await MainActor.run { NSWorkspace.shared.open(fileURL) }
-                    return
-                }
+        if [ ! -d "$SOURCE_APP" ]; then
+            hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null
+            open "$DMG_PATH"
+            exit 1
+        fi
 
-                // Create a shell script that waits for the app to quit, replaces it, and relaunches
-                let script = """
-                #!/bin/bash
-                sleep 1
-                rm -rf "\(destApp)"
-                cp -R "\(sourceApp)" "\(destApp)"
-                hdiutil detach "\(mountPoint)" -quiet
-                open "\(destApp)"
-                rm -f "$0"
-                """
+        # Wait for the app to quit
+        sleep 2
 
-                let scriptPath = NSTemporaryDirectory() + "tasktick_update.sh"
-                try script.write(toFile: scriptPath, atomically: true, encoding: .utf8)
+        # Replace and relaunch
+        rm -rf "$DEST_APP"
+        cp -R "$SOURCE_APP" "$DEST_APP"
+        hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null
+        open "$DEST_APP"
+        rm -f "$0"
+        """
 
-                let chmod = Process()
-                chmod.executableURL = URL(fileURLWithPath: "/bin/chmod")
-                chmod.arguments = ["+x", scriptPath]
-                try chmod.run()
-                chmod.waitUntilExit()
+        do {
+            let scriptPath = NSTemporaryDirectory() + "tasktick_update.sh"
+            try script.write(toFile: scriptPath, atomically: true, encoding: .utf8)
 
-                let installer = Process()
-                installer.executableURL = URL(fileURLWithPath: "/bin/bash")
-                installer.arguments = [scriptPath]
-                try installer.run()
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/bin/bash")
+            process.arguments = [scriptPath]
+            try process.run()
 
-                // Quit the current app
-                await MainActor.run { NSApp.terminate(nil) }
-
-            } catch {
-                await MainActor.run { NSWorkspace.shared.open(fileURL) }
-            }
+            // Quit immediately so the script can replace the app
+            NSApp.terminate(nil)
+        } catch {
+            NSWorkspace.shared.open(fileURL)
         }
     }
 
