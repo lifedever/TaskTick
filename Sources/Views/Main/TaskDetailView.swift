@@ -224,6 +224,20 @@ struct TaskDetailView: View {
                     }
 
                     detailRow(L10n.tr("task.detail.timeout"), value: L10n.tr("task.detail.timeout_value", task.timeoutSeconds))
+
+                    // Notification status
+                    let notifyLabel: String = {
+                        if task.notifyOnSuccess && task.notifyOnFailure {
+                            return L10n.tr("notify.both_short")
+                        } else if task.notifyOnSuccess {
+                            return L10n.tr("notify.success_short")
+                        } else if task.notifyOnFailure {
+                            return L10n.tr("notify.failure_short")
+                        } else {
+                            return L10n.tr("notify.off")
+                        }
+                    }()
+                    detailRow(L10n.tr("editor.section.notification"), value: notifyLabel)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

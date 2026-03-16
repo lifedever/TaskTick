@@ -92,6 +92,7 @@
 "notify.success_short" = "成功";
 "notify.failure_short" = "失败";
 "notify.both_short" = "全部";
+"notify.off" = "关闭";
 
 /* Schedule */
 "schedule.cron" = "Cron 表达式";
@@ -250,6 +251,7 @@
 "command.refresh" = "刷新";
 "command.github_home" = "GitHub 主页";
 "command.report_issue" = "报告问题";
+"command.sponsor" = "支持开发者";
 
 /* Clear Logs Confirmation */
 "clear_logs.title" = "清空日志";

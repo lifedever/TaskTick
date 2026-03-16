@@ -76,6 +76,7 @@ struct TaskListView: View {
                             isRunning: scheduler.runningTaskIDs.contains(task.id)
                         )
                         .tag(task)
+                        .pointerCursor()
                         .contextMenu {
                             Button(L10n.tr("task.detail.edit"), systemImage: "pencil") {
                                 EditorState.shared.openEdit(task)
@@ -136,6 +137,25 @@ struct TaskListView: View {
             }
         }
         .searchable(text: $searchText, prompt: Text(L10n.tr("task.search.prompt")))
+        .safeAreaInset(edge: .bottom) {
+            VStack(spacing: 0) {
+                Divider()
+                Link(destination: URL(string: "https://lifedever.github.io/sponsor/")!) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "heart")
+                            .font(.caption2)
+                        Text(L10n.tr("command.sponsor"))
+                            .font(.caption)
+                    }
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                }
+                .buttonStyle(.plain)
+                .pointerCursor()
+            }
+            .background(.bar)
+        }
     }
 
     private func duplicateTask(_ task: ScheduledTask) {

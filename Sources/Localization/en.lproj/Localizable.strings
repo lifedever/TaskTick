@@ -92,6 +92,7 @@
 "notify.success_short" = "Success";
 "notify.failure_short" = "Failure";
 "notify.both_short" = "All";
+"notify.off" = "Off";
 
 /* Schedule */
 "schedule.cron" = "Cron Expression";
@@ -250,6 +251,7 @@
 "command.refresh" = "Refresh";
 "command.github_home" = "GitHub Repository";
 "command.report_issue" = "Report an Issue";
+"command.sponsor" = "Support Developer";
 
 /* Clear Logs Confirmation */
 "clear_logs.title" = "Clear Logs";
