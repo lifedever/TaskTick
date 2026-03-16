@@ -5,6 +5,7 @@
 "menubar.open" = "Open";
 "menubar.no_tasks" = "No Tasks";
 "menubar.next_run" = "Next Run";
+"menubar.upcoming" = "Upcoming Tasks";
 "menubar.quit" = "Quit";
 
 /* Task List */
@@ -19,6 +20,8 @@
 "task.interval.seconds" = "%d sec";
 "task.status.enabled" = "Enabled";
 "task.status.disabled" = "Disabled";
+"task.duplicate" = "Duplicate";
+"task.duplicate.name" = "%@ (Copy)";
 
 /* Task Detail */
 "task.detail.enable" = "Enable";
@@ -70,9 +73,16 @@
 "editor.script.file_path" = "File Path";
 "editor.script.no_file" = "No file selected";
 "editor.script.placeholder" = "Enter shell script to execute";
+"editor.script.expand" = "Expand Editor";
+"editor.script.collapse" = "Done";
+"editor.script.validate" = "Validate Script";
+"editor.script.validating" = "Validating...";
+"editor.script.valid" = "Syntax OK";
+"editor.script.invalid" = "Syntax Error";
 "editor.shell" = "Shell";
 "editor.working_dir" = "Working Directory";
 "editor.working_dir.placeholder" = "Optional working directory path";
+"editor.working_dir.choose" = "Choose Directory";
 "editor.timeout" = "Timeout";
 "editor.timeout.seconds" = "seconds";
 "editor.section.notification" = "Notifications";
@@ -281,6 +291,82 @@
 "update.cancel" = "Cancel";
 "update.no_updates" = "You're up to date!";
 "update.no_updates.message" = "TaskTick %@ is the latest version.";
+
+/* Script Templates */
+"template.menu" = "Templates";
+"template.save_as" = "Save as Template";
+"template.my_templates" = "My Templates";
+"template.builtin" = "Built-in Templates";
+"template.add" = "New Template";
+"template.manage" = "Manage Templates...";
+"template.save.title" = "Save as Template";
+"template.save.name_placeholder" = "Template name";
+"template.overwrite.title" = "Replace Script?";
+"template.overwrite.message" = "The current script will be replaced with the template content.";
+"template.overwrite.confirm" = "Replace";
+"template.edit.title" = "Edit Template";
+"template.manage.title" = "Template Manager";
+"template.manage.empty" = "Select a Template";
+"template.manage.empty_description" = "Select a template from the sidebar to preview its content.";
+"template.manage.select_hint" = "Select a template from the sidebar to preview its content.";
+"template.manage.rename" = "Rename";
+"template.manage.delete" = "Delete";
+"template.manage.delete_confirm" = "Delete this template?";
+"template.info" = "Info";
+"template.created_at" = "Created";
+"template.category" = "Category";
+"template.category.none" = "Uncategorized";
+"template.category.new" = "New Category";
+"template.category.new_placeholder" = "Enter category name";
+"template.notes" = "Notes";
+"template.updated_at" = "Modified";
+"template.create_task" = "Create Task";
+"template.restore_defaults" = "Restore Default Templates";
+"template.import_file" = "Import File...";
+"template.script_hint" = "Write the script directly or import from a local file.";
+"editor.script.source.template" = "From Template";
+
+/* Default Template Names & Notes */
+"default_template.category.database" = "Database Backup";
+"default_template.category.logs" = "Log Cleanup";
+"default_template.category.git" = "Git Sync";
+"default_template.category.health" = "Health Check";
+"default_template.category.file_watch" = "File Monitoring";
+"default_template.category.docker" = "Docker";
+"default_template.mysql_backup.name" = "MySQL Backup";
+"default_template.mysql_backup.notes" = "Dump a MySQL database to a gzipped SQL file. Auto-cleans backups older than 7 days. Edit DB_HOST, DB_USER, DB_PASS, DB_NAME before use.";
+"default_template.pg_backup.name" = "PostgreSQL Backup";
+"default_template.pg_backup.notes" = "Dump a PostgreSQL database using pg_dump. Compresses with gzip, removes backups older than 7 days.";
+"default_template.log_cleanup.name" = "Log Cleanup";
+"default_template.log_cleanup.notes" = "Remove old .log, .log.gz, and rotated log files. Default retention: 30 days. Adjust DAYS and LOG_DIR as needed.";
+"default_template.git_sync.name" = "Git Pull & Sync";
+"default_template.git_sync.notes" = "Fetch all remotes, prune stale branches, and rebase-pull from main. Set REPO_DIR to your repository path.";
+"default_template.health_check.name" = "HTTP Health Check";
+"default_template.health_check.notes" = "Check if a URL returns HTTP 200. Exits with code 1 on failure — useful for triggering failure notifications.";
+"default_template.disk_monitor.name" = "Disk Usage Monitor";
+"default_template.disk_monitor.notes" = "Monitor root partition usage. Exits with code 1 when usage exceeds threshold (default 80%).";
+"default_template.docker_cleanup.name" = "Docker Cleanup";
+"default_template.docker_cleanup.notes" = "Prune all unused Docker containers, images, volumes, and networks. Shows disk usage summary after cleanup.";
+"default_template.category.backup" = "Backup & Sync";
+"default_template.category.notification" = "Notifications";
+"default_template.dir_backup.name" = "Directory Backup";
+"default_template.dir_backup.notes" = "Compress a directory to tar.gz. Auto-cleans backups older than 30 days. Edit SOURCE_DIR and BACKUP_DIR.";
+"default_template.redis_backup.name" = "Redis Backup";
+"default_template.redis_backup.notes" = "Trigger Redis BGSAVE and copy the dump.rdb file. Cleans backups older than 7 days.";
+"default_template.mongodb_backup.name" = "MongoDB Backup";
+"default_template.mongodb_backup.notes" = "Dump a MongoDB database with mongodump, compress to tar.gz. Cleans backups older than 7 days.";
+"default_template.ssl_check.name" = "SSL Certificate Check";
+"default_template.ssl_check.notes" = "Check SSL certificate expiry for a domain. Exits with code 1 if expiring within 30 days.";
+"default_template.process_monitor.name" = "Process Monitor";
+"default_template.process_monitor.notes" = "Check if a specific process is running. Exits with code 1 if not found — useful with failure notifications.";
+"default_template.port_check.name" = "Port Check";
+"default_template.port_check.notes" = "Check if a TCP port is reachable. Exits with code 1 if unreachable.";
+"default_template.memory_monitor.name" = "Memory Usage Monitor";
+"default_template.memory_monitor.notes" = "Monitor macOS memory usage. Exits with code 1 when usage exceeds threshold (default 80%).";
+"default_template.rsync.name" = "Rsync Directory Sync";
+"default_template.rsync.notes" = "Sync a local directory to a backup destination using rsync. Supports incremental updates with --delete.";
+"default_template.webhook.name" = "Webhook Notification";
+"default_template.webhook.notes" = "Send a message to a Slack/Discord webhook URL. Useful as a post-task notification step.";
 
 /* Cron Human Readable */
 "cron.human.every_minute" = "Every minute";

@@ -133,9 +133,6 @@ echo "── Done ──"
 echo "  ${APP_BUNDLE}"
 echo ""
 
-# Open or install
-read -p "Open the app now? [Y/n] " -n 1 -r
-echo ""
-if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-  open "${APP_BUNDLE}"
-fi
+# Kill existing dev app and relaunch
+pkill -f "${DEV_APP_NAME}" 2>/dev/null && sleep 0.5
+open "${APP_BUNDLE}"

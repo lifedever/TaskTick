@@ -5,6 +5,7 @@
 "menubar.open" = "打开";
 "menubar.no_tasks" = "暂无任务";
 "menubar.next_run" = "下次执行";
+"menubar.upcoming" = "即将执行";
 "menubar.quit" = "退出";
 
 /* Task List */
@@ -19,6 +20,8 @@
 "task.interval.seconds" = "%d 秒";
 "task.status.enabled" = "已启用";
 "task.status.disabled" = "已禁用";
+"task.duplicate" = "复制";
+"task.duplicate.name" = "%@（副本）";
 
 /* Task Detail */
 "task.detail.enable" = "启用";
@@ -70,9 +73,16 @@
 "editor.script.file_path" = "文件路径";
 "editor.script.no_file" = "未选择文件";
 "editor.script.placeholder" = "输入要执行的 Shell 脚本";
+"editor.script.expand" = "展开编辑器";
+"editor.script.collapse" = "完成";
+"editor.script.validate" = "校验脚本";
+"editor.script.validating" = "校验中...";
+"editor.script.valid" = "语法正确";
+"editor.script.invalid" = "语法错误";
 "editor.shell" = "Shell";
 "editor.working_dir" = "工作目录";
 "editor.working_dir.placeholder" = "可选的工作目录路径";
+"editor.working_dir.choose" = "选择目录";
 "editor.timeout" = "超时时间";
 "editor.timeout.seconds" = "秒";
 "editor.section.notification" = "通知";
@@ -281,6 +291,82 @@
 "update.cancel" = "取消";
 "update.no_updates" = "已是最新版本！";
 "update.no_updates.message" = "TaskTick %@ 是当前最新版本。";
+
+/* Script Templates */
+"template.menu" = "模板";
+"template.save_as" = "保存为模板";
+"template.my_templates" = "我的模板";
+"template.builtin" = "内置模板";
+"template.add" = "新建模板";
+"template.manage" = "管理模板...";
+"template.save.title" = "保存为模板";
+"template.save.name_placeholder" = "模板名称";
+"template.overwrite.title" = "替换脚本？";
+"template.overwrite.message" = "当前脚本内容将被模板内容替换。";
+"template.overwrite.confirm" = "替换";
+"template.edit.title" = "编辑模板";
+"template.manage.title" = "模板管理";
+"template.manage.empty" = "选择一个模板";
+"template.manage.empty_description" = "从左侧列表选择模板预览内容。";
+"template.manage.select_hint" = "从左侧列表选择模板预览内容。";
+"template.manage.rename" = "重命名";
+"template.manage.delete" = "删除";
+"template.manage.delete_confirm" = "确定要删除该模板吗？";
+"template.info" = "信息";
+"template.created_at" = "创建时间";
+"template.category" = "分类";
+"template.category.none" = "未分类";
+"template.category.new" = "新建分类";
+"template.category.new_placeholder" = "输入分类名称";
+"template.notes" = "备注";
+"template.updated_at" = "修改时间";
+"template.create_task" = "用此模板创建任务";
+"template.restore_defaults" = "恢复默认模板";
+"template.import_file" = "导入文件...";
+"template.script_hint" = "直接编写脚本，或从本地文件导入。";
+"editor.script.source.template" = "从模板";
+
+/* Default Template Names & Notes */
+"default_template.category.database" = "数据库备份";
+"default_template.category.logs" = "日志清理";
+"default_template.category.git" = "Git 同步";
+"default_template.category.health" = "健康检查";
+"default_template.category.file_watch" = "文件监控";
+"default_template.category.docker" = "Docker";
+"default_template.mysql_backup.name" = "MySQL 备份";
+"default_template.mysql_backup.notes" = "将 MySQL 数据库导出为 gzip 压缩的 SQL 文件，自动清理 7 天前的备份。使用前需修改 DB_HOST、DB_USER、DB_PASS、DB_NAME。";
+"default_template.pg_backup.name" = "PostgreSQL 备份";
+"default_template.pg_backup.notes" = "使用 pg_dump 导出 PostgreSQL 数据库，gzip 压缩，自动清理 7 天前的备份。";
+"default_template.log_cleanup.name" = "日志清理";
+"default_template.log_cleanup.notes" = "清理 .log、.log.gz 及轮转日志文件，默认保留 30 天。可调整 DAYS 和 LOG_DIR。";
+"default_template.git_sync.name" = "Git 拉取同步";
+"default_template.git_sync.notes" = "拉取所有远程分支，清理过期引用，rebase 合并 main 分支。使用前设置 REPO_DIR。";
+"default_template.health_check.name" = "HTTP 健康检查";
+"default_template.health_check.notes" = "检查 URL 是否返回 HTTP 200。失败时退出码为 1，可配合失败通知使用。";
+"default_template.disk_monitor.name" = "磁盘用量监控";
+"default_template.disk_monitor.notes" = "监控根分区磁盘使用率，超过阈值（默认 80%）时退出码为 1。";
+"default_template.docker_cleanup.name" = "Docker 清理";
+"default_template.docker_cleanup.notes" = "清理所有未使用的 Docker 容器、镜像、卷和网络，清理后显示磁盘占用。";
+"default_template.category.backup" = "备份与同步";
+"default_template.category.notification" = "通知";
+"default_template.dir_backup.name" = "目录备份";
+"default_template.dir_backup.notes" = "将目录压缩为 tar.gz 归档文件，自动清理 30 天前的备份。修改 SOURCE_DIR 和 BACKUP_DIR 后使用。";
+"default_template.redis_backup.name" = "Redis 备份";
+"default_template.redis_backup.notes" = "触发 Redis BGSAVE 并复制 dump.rdb 文件，自动清理 7 天前的备份。";
+"default_template.mongodb_backup.name" = "MongoDB 备份";
+"default_template.mongodb_backup.notes" = "使用 mongodump 导出 MongoDB 数据库并压缩为 tar.gz，自动清理 7 天前的备份。";
+"default_template.ssl_check.name" = "SSL 证书检查";
+"default_template.ssl_check.notes" = "检查域名 SSL 证书到期时间，30 天内到期则退出码为 1。";
+"default_template.process_monitor.name" = "进程监控";
+"default_template.process_monitor.notes" = "检查指定进程是否在运行，未运行时退出码为 1，可配合失败通知使用。";
+"default_template.port_check.name" = "端口检查";
+"default_template.port_check.notes" = "检查 TCP 端口是否可达，不可达时退出码为 1。";
+"default_template.memory_monitor.name" = "内存用量监控";
+"default_template.memory_monitor.notes" = "监控 macOS 内存使用率，超过阈值（默认 80%）时退出码为 1。";
+"default_template.rsync.name" = "Rsync 目录同步";
+"default_template.rsync.notes" = "使用 rsync 将本地目录同步到备份目标，支持增量更新和 --delete 删除多余文件。";
+"default_template.webhook.name" = "Webhook 通知";
+"default_template.webhook.notes" = "向 Slack/Discord 等 Webhook URL 发送消息，可作为任务完成后的通知步骤。";
 
 /* Cron Human Readable */
 "cron.human.every_minute" = "每分钟";

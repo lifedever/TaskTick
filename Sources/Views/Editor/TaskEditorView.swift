@@ -5,17 +5,20 @@ import UniformTypeIdentifiers
 enum ScriptSource: String, CaseIterable {
     case inline
     case file
+    case template
 
     var label: String {
         switch self {
         case .inline: L10n.tr("editor.script.source.inline")
         case .file: L10n.tr("editor.script.source.file")
+        case .template: L10n.tr("editor.script.source.template")
         }
     }
 }
 
 struct TaskEditorView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.openWindow) private var openWindow
     @ObservedObject private var editorState = EditorState.shared
 
     var task: ScheduledTask? { editorState.taskToEdit }
@@ -52,15 +55,31 @@ struct TaskEditorView: View {
 
     @State private var selectedTab = 0
     @State private var loadedTaskId: UUID?
+    @State private var loadedForNew = false
+
+    // Script validation
+    @State private var isValidating = false
+    @State private var validationResult: ScriptValidationResult?
+
+    // Templates
+    @State private var showingTemplateOverwriteConfirm = false
+    @State private var pendingTemplate: ScriptTemplate?
+    @ObservedObject private var templateStore = ScriptTemplateStore.shared
+
+    enum ScriptValidationResult {
+        case success
+        case error(String)
+    }
 
     var isEditing: Bool { task != nil }
 
     var canSave: Bool {
         let hasName = !name.trimmingCharacters(in: .whitespaces).isEmpty
         let hasScript: Bool
-        if scriptSource == .inline {
+        switch scriptSource {
+        case .inline, .template:
             hasScript = !scriptBody.trimmingCharacters(in: .whitespaces).isEmpty
-        } else {
+        case .file:
             hasScript = !scriptFilePath.isEmpty && FileManager.default.fileExists(atPath: scriptFilePath)
         }
         return hasName && hasScript
@@ -239,9 +258,10 @@ struct TaskEditorView: View {
                 }
                 .pickerStyle(.segmented)
 
-                if scriptSource == .inline {
+                switch scriptSource {
+                case .inline:
                     ScriptEditorView(scriptBody: $scriptBody)
-                } else {
+                case .file:
                     HStack {
                         Image(systemName: "doc.text")
                             .foregroundStyle(.secondary)
@@ -267,6 +287,54 @@ struct TaskEditorView: View {
                             .font(.system(size: 12, design: .monospaced))
                             .foregroundStyle(.secondary)
                     }
+                case .template:
+                    templatePicker
+                }
+
+                if scriptSource != .template {
+                    HStack(spacing: 10) {
+                        Button {
+                            validateScript()
+                        } label: {
+                            if isValidating {
+                                ProgressView()
+                                    .controlSize(.small)
+                            } else {
+                                Text(L10n.tr("editor.script.validate"))
+                            }
+                        }
+                        .disabled(isValidating || currentScript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .pointerCursor()
+
+                        if let result = validationResult {
+                            switch result {
+                            case .success:
+                                HStack(spacing: 4) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                    Text(L10n.tr("editor.script.valid"))
+                                }
+                                .font(.caption)
+                                .foregroundStyle(.green)
+                            case .error(let message):
+                                HStack(spacing: 4) {
+                                    Image(systemName: "xmark.circle.fill")
+                                    Text(message)
+                                        .lineLimit(2)
+                                        .textSelection(.enabled)
+                                }
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                            }
+                        }
+
+                        Spacer()
+
+                        Button(L10n.tr("template.save_as")) {
+                            SaveTemplateView.open(scriptBody: scriptBody, shell: shell, workingDirectory: workingDirectory, openWindow: openWindow)
+                        }
+                        .disabled(scriptBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .pointerCursor()
+                    }
                 }
             }
 
@@ -277,7 +345,7 @@ struct TaskEditorView: View {
                     Text("/bin/sh").tag("/bin/sh")
                 }
 
-                TextField(L10n.tr("editor.working_dir"), text: $workingDirectory, prompt: Text(L10n.tr("editor.working_dir.placeholder")))
+                WorkingDirectoryField(path: $workingDirectory)
 
                 LabeledContent(L10n.tr("editor.timeout")) {
                     HStack(spacing: 6) {
@@ -292,6 +360,77 @@ struct TaskEditorView: View {
             }
         }
         .formStyle(.grouped)
+        .alert(L10n.tr("template.overwrite.title"), isPresented: $showingTemplateOverwriteConfirm) {
+            Button(L10n.tr("editor.cancel"), role: .cancel) {
+                pendingTemplate = nil
+            }
+            Button(L10n.tr("template.overwrite.confirm"), role: .destructive) {
+                if let template = pendingTemplate {
+                    applyTemplate(template)
+                }
+                pendingTemplate = nil
+            }
+        } message: {
+            Text(L10n.tr("template.overwrite.message"))
+        }
+    }
+
+    // MARK: - Template Picker
+
+    private var templatePicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Menu {
+                ForEach(templateStore.groupedTemplates, id: \.category) { group in
+                    if group.category.isEmpty {
+                        ForEach(group.templates) { template in
+                            Button(template.name) {
+                                selectTemplate(template)
+                            }
+                        }
+                    } else {
+                        Menu(group.category) {
+                            ForEach(group.templates) { template in
+                                Button(template.name) {
+                                    selectTemplate(template)
+                                }
+                            }
+                        }
+                    }
+                }
+            } label: {
+                Label(L10n.tr("template.menu"), systemImage: "doc.on.doc")
+            }
+            .pointerCursor()
+
+            if !scriptBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+                scriptBody != "#!/bin/zsh\n" && scriptBody != "#!/bin/bash\n" && scriptBody != "#!/bin/sh\n" {
+                Text(scriptBody.prefix(300) + (scriptBody.count > 300 ? "\n..." : ""))
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .frame(maxHeight: 120)
+            }
+        }
+    }
+
+    private func selectTemplate(_ template: ScriptTemplate) {
+        let hasContent = !scriptBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+            scriptBody != "#!/bin/zsh\n" && scriptBody != "#!/bin/bash\n" && scriptBody != "#!/bin/sh\n"
+        if hasContent {
+            pendingTemplate = template
+            showingTemplateOverwriteConfirm = true
+        } else {
+            applyTemplate(template)
+        }
+    }
+
+    private func applyTemplate(_ template: ScriptTemplate) {
+        scriptBody = template.scriptBody
+        shell = template.shell
+        if !template.workingDirectory.isEmpty {
+            workingDirectory = template.workingDirectory
+        }
+        scriptSource = .inline
+        validationResult = nil
     }
 
     // MARK: - Notification Tab
@@ -308,11 +447,166 @@ struct TaskEditorView: View {
             }
         }
         .formStyle(.grouped)
+        .onChange(of: shell) { _, newShell in
+            if scriptSource == .inline {
+                let newShebang = "#!\(newShell)"
+                if scriptBody.hasPrefix("#!") {
+                    // Replace existing shebang line
+                    if let firstNewline = scriptBody.firstIndex(of: "\n") {
+                        scriptBody = newShebang + scriptBody[firstNewline...]
+                    } else {
+                        scriptBody = newShebang + "\n"
+                    }
+                } else if scriptBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    scriptBody = newShebang + "\n"
+                }
+            }
+        }
+    }
+
+    // MARK: - Script Validation
+
+    private var currentScript: String {
+        if scriptSource == .file {
+            if scriptFilePath.isEmpty { return "" }
+            return (try? String(contentsOfFile: scriptFilePath, encoding: .utf8)) ?? ""
+        }
+        return scriptBody
+    }
+
+    private func validateScript() {
+        let script = currentScript
+        guard !script.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+
+        isValidating = true
+        validationResult = nil
+        let selectedShell = shell
+
+        Task.detached {
+            let result: ScriptValidationResult
+
+            if selectedShell.contains("python") {
+                // Python: compile check
+                result = await Self.runValidation(
+                    executable: selectedShell,
+                    arguments: ["-c", "import py_compile,sys; py_compile.compile(sys.argv[1], doraise=True)", "-"],
+                    input: script
+                )
+            } else {
+                // Shell: syntax check with -n, then verify commands exist
+                let syntaxResult = await Self.runValidation(
+                    executable: selectedShell,
+                    arguments: ["-n"],
+                    input: script
+                )
+
+                switch syntaxResult {
+                case .error:
+                    result = syntaxResult
+                case .success:
+                    // Also check if commands in the script exist
+                    let checkScript = """
+                    check_cmd() {
+                        command -v "$1" >/dev/null 2>&1 || echo "command not found: $1"
+                    }
+                    \(script.components(separatedBy: .newlines)
+                        .map { $0.trimmingCharacters(in: .whitespaces) }
+                        .filter { !$0.isEmpty && !$0.hasPrefix("#") && !$0.hasPrefix("//") }
+                        .compactMap { line -> String? in
+                            // Extract first word (the command) from simple lines
+                            let stripped = line
+                                .replacingOccurrences(of: "^(if|then|else|fi|for|do|done|while|case|esac|function|export|local|declare|readonly|unset)\\b.*", with: "", options: .regularExpression)
+                                .trimmingCharacters(in: .whitespaces)
+                            guard !stripped.isEmpty else { return nil }
+                            // Get the first token, skip variable assignments
+                            let tokens = stripped.components(separatedBy: .whitespaces)
+                            guard let first = tokens.first,
+                                  !first.contains("="),
+                                  !first.hasPrefix("$"),
+                                  !first.hasPrefix("\""),
+                                  !first.hasPrefix("'"),
+                                  !first.hasPrefix("{"),
+                                  !first.hasPrefix("}"),
+                                  !first.hasPrefix("("),
+                                  !first.hasPrefix(")"),
+                                  !first.hasPrefix("|"),
+                                  !first.hasPrefix("&"),
+                                  !first.hasPrefix(";"),
+                                  !first.hasPrefix("[")
+                            else { return nil }
+                            return "check_cmd \(first)"
+                        }
+                        .joined(separator: "\n"))
+                    """
+                    let warnings = await Self.runCommandCheck(executable: selectedShell, script: checkScript)
+                    if let warnings, !warnings.isEmpty {
+                        result = .error(warnings)
+                    } else {
+                        result = .success
+                    }
+                }
+            }
+
+            await MainActor.run {
+                validationResult = result
+                isValidating = false
+            }
+        }
+    }
+
+    private static func runValidation(executable: String, arguments: [String], input: String) async -> ScriptValidationResult {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: executable)
+        process.arguments = arguments
+
+        let inputPipe = Pipe()
+        let errorPipe = Pipe()
+        process.standardInput = inputPipe
+        process.standardError = errorPipe
+        process.standardOutput = FileHandle.nullDevice
+
+        do {
+            try process.run()
+            inputPipe.fileHandleForWriting.write(Data(input.utf8))
+            inputPipe.fileHandleForWriting.closeFile()
+            process.waitUntilExit()
+
+            if process.terminationStatus == 0 {
+                return .success
+            } else {
+                let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+                let errorMessage = String(data: errorData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                return .error(errorMessage.isEmpty ? "Exit code: \(process.terminationStatus)" : errorMessage)
+            }
+        } catch {
+            return .error(error.localizedDescription)
+        }
+    }
+
+    private static func runCommandCheck(executable: String, script: String) async -> String? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: executable)
+        process.arguments = ["-c", script]
+        let outPipe = Pipe()
+        process.standardOutput = outPipe
+        process.standardError = FileHandle.nullDevice
+        process.standardInput = FileHandle.nullDevice
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+            let data = outPipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            return output?.isEmpty == true ? nil : output
+        } catch {
+            return nil
+        }
     }
 
     // MARK: - Helpers
 
     private func closeWindow() {
+        loadedForNew = false
         editorState.close()
         // Close the editor window by finding it
         for window in NSApp.windows where window.identifier?.rawValue == "editor" || window.title == L10n.tr("editor.title.edit") || window.title == L10n.tr("editor.title.new") {
@@ -355,7 +649,13 @@ struct TaskEditorView: View {
 
     private func loadTask() {
         let currentId = task?.id
-        guard currentId != loadedTaskId else { return }
+        if currentId == nil {
+            guard !loadedForNew else { return }
+            loadedForNew = true
+        } else {
+            guard currentId != loadedTaskId else { return }
+            loadedForNew = false
+        }
         loadedTaskId = currentId
 
         // Reset to defaults for new task
@@ -371,7 +671,7 @@ struct TaskEditorView: View {
         customIntervalValue = 1
         customIntervalUnit = .day
         shell = "/bin/zsh"
-        scriptBody = ""
+        scriptBody = "#!/bin/zsh\n"
         scriptSource = .inline
         scriptFilePath = ""
         workingDirectory = ""
@@ -379,6 +679,18 @@ struct TaskEditorView: View {
         notifyOnSuccess = false
         notifyOnFailure = true
         selectedTab = 0
+
+        // Apply template if present (for new task from template)
+        if let template = editorState.pendingTemplate, task == nil {
+            name = template.name
+            scriptBody = template.scriptBody
+            shell = template.shell
+            if !template.workingDirectory.isEmpty {
+                workingDirectory = template.workingDirectory
+            }
+            scriptSource = .inline
+            editorState.pendingTemplate = nil
+        }
 
         guard let task else { return }
         name = task.name
@@ -454,6 +766,7 @@ struct TaskEditorView: View {
 
         try? modelContext.save()
         TaskScheduler.shared.rebuildSchedule()
+        EditorState.shared.lastSavedTask = target
         closeWindow()
     }
 }

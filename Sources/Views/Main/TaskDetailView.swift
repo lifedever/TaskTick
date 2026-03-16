@@ -352,10 +352,9 @@ struct TaskDetailView: View {
                             HStack(spacing: 8) {
                                 StatusBadge(status: log.status, compact: true)
 
-                                Text(log.startedAt.formatted(date: .omitted, time: .shortened))
+                                Text(Self.timeAgo(log.startedAt))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
-                                    .monospacedDigit()
 
                                 Spacer()
 
@@ -392,6 +391,16 @@ struct TaskDetailView: View {
                 .fontWeight(.medium)
                 .textSelection(.enabled)
         }
+    }
+
+    private static let relativeFormatter: RelativeDateTimeFormatter = {
+        let f = RelativeDateTimeFormatter()
+        f.unitsStyle = .short
+        return f
+    }()
+
+    private static func timeAgo(_ date: Date) -> String {
+        relativeFormatter.localizedString(for: date, relativeTo: Date())
     }
 }
 

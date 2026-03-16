@@ -17,6 +17,7 @@ final class UpdateChecker: ObservableObject {
     @Published var totalBytes: Int64 = 0
     @Published var downloadComplete = false
     @Published var downloadedFileURL: URL?
+    private var periodicTimer: Timer?
 
     // UI state
     @Published var showUpdateDialog = false
@@ -236,13 +237,14 @@ final class UpdateChecker: ObservableObject {
     }
 
     func startPeriodicChecks() {
+        periodicTimer?.invalidate()
         let interval = UserDefaults.standard.integer(forKey: "updateCheckInterval")
         let hours = interval > 0 ? interval : 24
 
-        Timer.scheduledTimer(withTimeInterval: TimeInterval(hours * 3600), repeats: true) { _ in
+        periodicTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(hours * 3600), repeats: true) { [weak self] _ in
             Task { @MainActor in
                 guard UserDefaults.standard.bool(forKey: "autoCheckUpdates") else { return }
-                await UpdateChecker.shared.checkForUpdates()
+                await self?.checkForUpdates()
             }
         }
     }

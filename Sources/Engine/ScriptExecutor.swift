@@ -8,6 +8,7 @@ final class ScriptExecutor: ObservableObject {
     @Published var runningProcesses: [UUID: Process] = [:]
 
     static let shared = ScriptExecutor()
+    private let executionSemaphore = DispatchSemaphore(value: 8)
 
     private init() {}
 
@@ -119,6 +120,8 @@ final class ScriptExecutor: ObservableObject {
     ) async -> ProcessResult {
         // Run the entire process on a background queue to avoid blocking the main thread
         await withCheckedContinuation { (continuation: CheckedContinuation<ProcessResult, Never>) in
+            // Limit concurrent executions to prevent resource exhaustion
+            self.executionSemaphore.wait()
             DispatchQueue.global(qos: .userInitiated).async {
                 let process = Process()
                 let stdoutPipe = Pipe()
@@ -171,6 +174,7 @@ final class ScriptExecutor: ObservableObject {
                 do {
                     try process.run()
                 } catch {
+                    self.executionSemaphore.signal()
                     continuation.resume(returning: ProcessResult(
                         stdout: "",
                         stderr: "Failed to start process: \(error.localizedDescription)",
@@ -222,6 +226,7 @@ final class ScriptExecutor: ObservableObject {
                     status = .failure
                 }
 
+                self.executionSemaphore.signal()
                 continuation.resume(returning: ProcessResult(
                     stdout: stdout,
                     stderr: stderr,

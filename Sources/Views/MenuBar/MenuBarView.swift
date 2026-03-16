@@ -8,8 +8,12 @@ struct MenuBarView: View {
     @Query(sort: \ScheduledTask.createdAt, order: .reverse) private var tasks: [ScheduledTask]
     @StateObject private var scheduler = TaskScheduler.shared
 
-    var enabledTasks: [ScheduledTask] {
-        tasks.filter(\.isEnabled)
+    var upcomingTasks: [ScheduledTask] {
+        tasks
+            .filter { $0.isEnabled && $0.nextRunAt != nil }
+            .sorted { ($0.nextRunAt ?? .distantFuture) < ($1.nextRunAt ?? .distantFuture) }
+            .prefix(5)
+            .map { $0 }
     }
 
     var body: some View {
@@ -21,7 +25,7 @@ struct MenuBarView: View {
                 Text(L10n.tr("app.name"))
                     .font(.headline)
                 Spacer()
-                Text("\(enabledTasks.count)/\(tasks.count)")
+                Text("\(tasks.filter(\.isEnabled).count)/\(tasks.count)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
@@ -31,7 +35,7 @@ struct MenuBarView: View {
 
             Divider()
 
-            if tasks.isEmpty {
+            if upcomingTasks.isEmpty {
                 VStack(spacing: 8) {
                     Image(systemName: "tray")
                         .font(.largeTitle)
@@ -45,7 +49,16 @@ struct MenuBarView: View {
             } else {
                 ScrollView {
                     VStack(spacing: 2) {
-                        ForEach(enabledTasks.prefix(10)) { task in
+                        HStack {
+                            Text(L10n.tr("menubar.upcoming"))
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.top, 4)
+
+                        ForEach(upcomingTasks) { task in
                             MenuBarTaskRow(task: task, isRunning: scheduler.runningTaskIDs.contains(task.id))
                         }
                     }
@@ -60,9 +73,19 @@ struct MenuBarView: View {
             VStack(spacing: 0) {
                 // Open main window
                 Button(action: {
+                    // Dismiss the MenuBarExtra panel
+                    if let panel = NSApp.keyWindow as? NSPanel {
+                        panel.orderOut(nil)
+                    }
+
                     NSApp.setActivationPolicy(.regular)
                     openWindow(id: "main")
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        for window in NSApp.windows where window.canBecomeMain && !(window is NSPanel) {
+                            window.makeKeyAndOrderFront(nil)
+                            break
+                        }
                         NSApp.activate(ignoringOtherApps: true)
                     }
                 }) {

@@ -4,6 +4,7 @@ import SwiftData
 struct MainWindowView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.openWindow) private var openWindow
+    @StateObject private var editorState = EditorState.shared
     @State private var selectedTask: ScheduledTask?
     @Binding var showingCrontabImport: Bool
 
@@ -35,6 +36,12 @@ struct MainWindowView: View {
         }
         .sheet(isPresented: $showingCrontabImport) {
             CrontabImportView()
+        }
+        .onChange(of: editorState.lastSavedTask) { _, newTask in
+            if let task = newTask {
+                selectedTask = task
+                editorState.lastSavedTask = nil
+            }
         }
     }
 }

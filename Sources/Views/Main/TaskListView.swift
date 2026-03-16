@@ -18,7 +18,7 @@ enum TaskFilter: String, CaseIterable {
 struct TaskListView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.openWindow) private var openWindow
-    @Query(sort: \ScheduledTask.createdAt, order: .reverse) private var tasks: [ScheduledTask]
+    @Query(sort: \ScheduledTask.createdAt, order: .forward) private var tasks: [ScheduledTask]
     @Binding var selectedTask: ScheduledTask?
     @State private var filter: TaskFilter = .all
     @State private var searchText = ""
@@ -87,12 +87,16 @@ struct TaskListView: View {
                                 }
                             }
                             Divider()
+                            Button(L10n.tr("task.duplicate"), systemImage: "doc.on.doc") {
+                                duplicateTask(task)
+                            }
+                            Divider()
                             Button(L10n.tr("clear_logs.title"), systemImage: "trash.circle") {
                                 taskToClearLogs = task
                                 showingClearLogsAlert = true
                             }
                             .disabled(task.executionLogs.isEmpty)
-                            Button(L10n.tr("task.detail.delete"), role: .destructive) {
+                            Button(L10n.tr("task.detail.delete"), systemImage: "trash", role: .destructive) {
                                 taskToDelete = task
                                 showingDeleteAlert = true
                             }
@@ -131,6 +135,30 @@ struct TaskListView: View {
             }
         }
         .searchable(text: $searchText, prompt: Text(L10n.tr("task.search.prompt")))
+    }
+
+    private func duplicateTask(_ task: ScheduledTask) {
+        let copy = ScheduledTask(
+            name: L10n.tr("task.duplicate.name", task.name),
+            scriptBody: task.scriptBody,
+            shell: task.shell,
+            scheduledDate: task.scheduledDate,
+            repeatType: task.repeatType,
+            endRepeatType: task.endRepeatType,
+            endRepeatDate: task.endRepeatDate,
+            endRepeatCount: task.endRepeatCount,
+            isEnabled: false,
+            workingDirectory: task.workingDirectory,
+            timeoutSeconds: task.timeoutSeconds,
+            notifyOnSuccess: task.notifyOnSuccess,
+            notifyOnFailure: task.notifyOnFailure
+        )
+        copy.scriptFilePath = task.scriptFilePath
+        copy.customIntervalValue = task.customIntervalValue
+        copy.customIntervalUnit = task.customIntervalUnit
+        modelContext.insert(copy)
+        try? modelContext.save()
+        selectedTask = copy
     }
 }
 
