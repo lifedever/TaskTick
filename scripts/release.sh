@@ -12,7 +12,7 @@ APP_NAME="TaskTick"
 BUNDLE_ID="com.lifedever.TaskTick"
 REPO="lifedever/TaskTick"
 GITEE_REPO="lifedever/task-tick"
-MIN_MACOS="15.0"
+MIN_MACOS="14.0"
 
 # ── Parse version ──
 if [ -z "${1:-}" ]; then

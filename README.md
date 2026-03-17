@@ -14,7 +14,7 @@
 <p align="center">
   <a href="https://github.com/lifedever/TaskTick/releases/latest"><img src="https://img.shields.io/github/v/release/lifedever/TaskTick?style=flat-square&color=34D399&label=Latest" alt="Latest Release"></a>
   <a href="https://github.com/lifedever/TaskTick/releases"><img src="https://img.shields.io/github/downloads/lifedever/TaskTick/total?style=flat-square&color=7C3AED&label=Downloads" alt="Downloads"></a>
-  <img src="https://img.shields.io/badge/platform-macOS%2015%2B-blue?style=flat-square" alt="Platform">
+  <img src="https://img.shields.io/badge/platform-macOS%2014%2B-blue?style=flat-square" alt="Platform">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square" alt="License"></a>
 </p>
 
@@ -55,7 +55,7 @@ Quickly create tasks from built-in templates or save your own scripts for reuse.
 
 ## Requirements
 
-- macOS 15 (Sequoia) or later
+- macOS 14 (Sonoma) or later
 - Apple Silicon or Intel Mac
 
 ## Install
