@@ -642,6 +642,7 @@ struct TaskEditorView: View {
         panel.allowedContentTypes = [
             .shellScript, .pythonScript,
             .plainText, .sourceCode,
+            .unixExecutable,
             UTType(filenameExtension: "sh")!,
             UTType(filenameExtension: "zsh") ?? .plainText,
             UTType(filenameExtension: "rb") ?? .plainText,
