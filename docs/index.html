@@ -38,8 +38,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(24px) s
 .nav-right{display:flex;align-items:center;gap:6px}
 .nav-right a{color:var(--text2);text-decoration:none;font-size:.84rem;font-weight:500;padding:6px 14px;border-radius:8px;transition:color .2s}
 .nav-right a:hover{color:var(--text)}
-.lang-switch{cursor:pointer;font-size:.78rem;padding:5px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text3);background:transparent;transition:all .2s;font-family:var(--font);appearance:none;-webkit-appearance:none;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a1a1aa'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
-.lang-switch:hover{border-color:var(--text2);color:var(--text2)}
+.lang-wrap{position:relative}
+.lang-btn{cursor:pointer;width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:transparent;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .2s}
+.lang-btn:hover,.lang-btn.active{border-color:var(--accent);color:var(--accent)}
+.lang-btn svg{width:18px;height:18px}
+.lang-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:180px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.12);padding:6px;z-index:200;animation:fadeUp .2s ease}
+.lang-menu.show{display:block}
+.lang-menu button{display:flex;align-items:center;gap:8px;width:100%;padding:8px 14px;border:none;background:transparent;color:var(--text2);font-size:.84rem;font-family:var(--font);border-radius:8px;cursor:pointer;transition:all .15s;text-align:left}
+.lang-menu button:hover{background:var(--surface);color:var(--text)}
+.lang-menu button.active{background:var(--accent);color:#fff}
+.lang-menu button.active:hover{opacity:.9}
 .nav-sponsor{color:#f472b6!important;font-weight:600!important}
 .nav-sponsor:hover{opacity:.8!important}
 .nav-cta{background:var(--text)!important;color:var(--bg)!important;font-weight:600!important;border-radius:8px!important;padding:6px 16px!important}
@@ -154,7 +162,7 @@ footer .right a:hover{color:var(--text)}
   .screenshot-item{width:100%}
   .install-methods{flex-direction:column}
   .install-card{min-width:0}
-  .nav-right a:not(.nav-cta):not(.lang-switch){display:none}
+  .nav-right a:not(.nav-cta):not(.lang-btn){display:none}
   footer .container{flex-direction:column;text-align:center}
 }
 @media(max-width:480px){.hero h1{font-size:1.9rem}.btn{padding:11px 22px;font-size:.85rem}}
@@ -176,7 +184,7 @@ footer .right a:hover{color:var(--text)}
   .feature-card{background:var(--bg2)}
   .feature-card:hover{background:rgba(255,255,255,.03)}
   .install-card{background:var(--bg2)}
-  .lang-switch{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2352525b'/%3E%3C/svg%3E")}
+  .lang-menu{background:var(--bg2);box-shadow:0 12px 40px rgba(0,0,0,.4)}
 }
 </style>
 </head>
@@ -194,19 +202,24 @@ footer .right a:hover{color:var(--text)}
       <a href="#install" data-i18n="nav_install">Install</a>
       <a href="https://github.com/lifedever/TaskTick">GitHub</a>
       <a href="https://www.lifedever.com/sponsor/" class="nav-sponsor">💖 <span data-i18n="nav_sponsor">Sponsor</span></a>
-      <select class="lang-switch" onchange="setLang(this.value)" id="langSelect">
-        <option value="zh-Hans">简体中文</option>
-        <option value="zh-Hant">繁體中文</option>
-        <option value="en">English</option>
-        <option value="ja">日本語</option>
-        <option value="ko">한국어</option>
-        <option value="fr">Français</option>
-        <option value="de">Deutsch</option>
-        <option value="it">Italiano</option>
-        <option value="es">Español</option>
-        <option value="ru">Русский</option>
-        <option value="id">Bahasa Indonesia</option>
-      </select>
+      <div class="lang-wrap">
+        <button class="lang-btn" onclick="toggleLangMenu()" aria-label="Language">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </button>
+        <div class="lang-menu" id="langMenu">
+          <button onclick="setLang('zh-Hans')">简体中文</button>
+          <button onclick="setLang('zh-Hant')">繁體中文</button>
+          <button onclick="setLang('en')">English</button>
+          <button onclick="setLang('ja')">日本語</button>
+          <button onclick="setLang('ko')">한국어</button>
+          <button onclick="setLang('fr')">Français</button>
+          <button onclick="setLang('de')">Deutsch</button>
+          <button onclick="setLang('it')">Italiano</button>
+          <button onclick="setLang('es')">Español</button>
+          <button onclick="setLang('ru')">Русский</button>
+          <button onclick="setLang('id')">Bahasa Indonesia</button>
+        </div>
+      </div>
       <a href="https://github.com/lifedever/TaskTick/releases" class="nav-cta" data-i18n="nav_download">Download</a>
     </div>
   </div>
@@ -888,9 +901,38 @@ function setLang(lang) {
       }
     }
   });
-  document.getElementById('langSelect').value = lang;
   document.documentElement.lang = lang.startsWith('zh') ? lang.split('-')[0] : lang;
   localStorage.setItem('tasktick-lang', lang);
+  // Update active state in menu
+  document.querySelectorAll('#langMenu button').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('onclick').indexOf("'" + lang + "'") !== -1);
+  });
+  // Close menu
+  document.getElementById('langMenu').classList.remove('show');
+  document.querySelector('.lang-btn').classList.remove('active');
+}
+
+function toggleLangMenu() {
+  var menu = document.getElementById('langMenu');
+  var btn = document.querySelector('.lang-btn');
+  var isOpen = menu.classList.contains('show');
+  menu.classList.toggle('show');
+  btn.classList.toggle('active');
+  if (!isOpen) {
+    setTimeout(function() {
+      document.addEventListener('click', closeLangMenu, { once: true });
+    }, 0);
+  }
+}
+
+function closeLangMenu(e) {
+  var wrap = document.querySelector('.lang-wrap');
+  if (!wrap.contains(e.target)) {
+    document.getElementById('langMenu').classList.remove('show');
+    document.querySelector('.lang-btn').classList.remove('active');
+  } else {
+    document.addEventListener('click', closeLangMenu, { once: true });
+  }
 }
 
 (function initLang() {
