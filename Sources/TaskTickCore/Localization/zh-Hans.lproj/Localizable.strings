@@ -156,6 +156,7 @@
 "schedule.manual_only.help" = "不进入定时调度，仅在右键菜单或菜单栏点击运行时执行";
 "tasklist.section.scheduled" = "自动调度";
 "tasklist.section.manual" = "手动脚本";
+"tasklist.latest_execution_help" = "最近执行结果：%@";
 
 /* Repeat Types */
 "repeat.never" = "永不";

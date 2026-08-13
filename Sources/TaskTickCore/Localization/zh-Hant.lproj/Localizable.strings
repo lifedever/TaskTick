@@ -156,6 +156,7 @@
 "schedule.manual_only.help" = "不進入排程，僅在右鍵選單或選單列點擊執行時觸發";
 "tasklist.section.scheduled" = "自動排程";
 "tasklist.section.manual" = "手動指令稿";
+"tasklist.latest_execution_help" = "最近執行結果：%@";
 
 /* Repeat Types */
 "repeat.never" = "永不";

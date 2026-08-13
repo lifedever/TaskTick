@@ -156,6 +156,7 @@
 "schedule.manual_only.help" = "Skip the scheduler — runs only via right-click or menu bar";
 "tasklist.section.scheduled" = "Scheduled";
 "tasklist.section.manual" = "Manual";
+"tasklist.latest_execution_help" = "Recent execution: %@";
 
 /* Repeat Types */
 "repeat.never" = "Never";

@@ -156,6 +156,7 @@
 "schedule.manual_only.help" = "Omite el programador — solo se ejecuta desde el menú contextual o la barra de menú";
 "tasklist.section.scheduled" = "Programadas";
 "tasklist.section.manual" = "Manuales";
+"tasklist.latest_execution_help" = "Última ejecución: %@";
 
 /* Repeat Types */
 "repeat.never" = "Nunca";

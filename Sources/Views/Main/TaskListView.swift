@@ -292,6 +292,17 @@ struct TaskListRow: View {
 
     private var runningHaloStroke: Color { .blue.opacity(0.3) }
 
+    /// The most recent execution's status, derived from the task's execution
+    /// logs. `nil` when the task has never run, so the row shows no icon rather
+    /// than a misleading one. Live `.running` logs are covered by the spinner
+    /// branch below, so they never show a stale icon here.
+    private var latestExecutionStatus: ExecutionStatus? {
+        task.executionLogs
+            .filter { $0.modelContext != nil }
+            .max { $0.startedAt < $1.startedAt }?
+            .status
+    }
+
     var body: some View {
         HStack(spacing: 10) {
             // Status indicator
@@ -367,6 +378,14 @@ struct TaskListRow: View {
                     // tint the spinner stays accent-coloured and disappears
                     // into the selection background.
                     .tint(isSelected ? Color.white : Color.accentColor)
+            } else if let status = latestExecutionStatus {
+                // Latest execution result, shown right-aligned. Reuses the same
+                // icons (and colour) as the "最近执行" list so the sidebar reads
+                // at a glance without opening the task.
+                Image(systemName: status.iconName)
+                    .font(.system(size: 12))
+                    .foregroundStyle(status.statusColor)
+                    .help(L10n.tr("tasklist.latest_execution_help", status.displayName))
             }
         }
         .padding(.vertical, 3)
