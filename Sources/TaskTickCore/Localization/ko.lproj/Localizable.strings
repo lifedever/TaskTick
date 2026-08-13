@@ -156,7 +156,6 @@
 "schedule.manual_only.help" = "스케줄러를 건너뛰고 우클릭 또는 메뉴 막대에서만 실행됩니다";
 "tasklist.section.scheduled" = "예약됨";
 "tasklist.section.manual" = "수동";
-"tasklist.latest_execution_help" = "최근 실행 결과: %@";
 
 /* Repeat Types */
 "repeat.never" = "안 함";

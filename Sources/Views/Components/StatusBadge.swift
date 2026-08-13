@@ -1,28 +1,19 @@
 import SwiftUI
 import TaskTickCore
 
-/// Semantic colour used across the app for a given execution status. Centralised
-/// here so the sidebar status icon, the "最近执行" list and `StatusBadge` all
-/// stay visually consistent.
-extension ExecutionStatus {
-    var statusColor: Color {
-        switch self {
-        case .running: .blue
-        case .success: .green
-        case .failure: .red
-        case .timeout: .orange
-        case .cancelled: .gray
-        }
-    }
-}
-
 /// A small badge displaying execution status with color and icon.
 struct StatusBadge: View {
     let status: ExecutionStatus
     var compact: Bool = false
 
     var color: Color {
-        status.statusColor
+        switch status {
+        case .running: .blue
+        case .success: .green
+        case .failure: .red
+        case .timeout: .orange
+        case .cancelled: .gray
+        }
     }
 
     var body: some View {

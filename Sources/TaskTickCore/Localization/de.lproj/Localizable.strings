@@ -156,7 +156,6 @@
 "schedule.manual_only.help" = "Umgeht den Planer — wird nur per Rechtsklick oder über die Menüleiste ausgeführt";
 "tasklist.section.scheduled" = "Geplant";
 "tasklist.section.manual" = "Manuell";
-"tasklist.latest_execution_help" = "Letzte Ausführung: %@";
 
 /* Repeat Types */
 "repeat.never" = "Nie";

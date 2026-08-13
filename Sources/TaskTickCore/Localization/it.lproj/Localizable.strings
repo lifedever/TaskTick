@@ -156,7 +156,6 @@
 "schedule.manual_only.help" = "Salta lo scheduler — viene eseguita solo dal menu contestuale o dalla barra dei menu";
 "tasklist.section.scheduled" = "Pianificate";
 "tasklist.section.manual" = "Manuali";
-"tasklist.latest_execution_help" = "Ultima esecuzione: %@";
 
 /* Repeat Types */
 "repeat.never" = "Mai";

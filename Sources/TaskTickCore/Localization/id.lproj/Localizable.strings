@@ -156,7 +156,6 @@
 "schedule.manual_only.help" = "Lewati penjadwal — hanya dijalankan via klik kanan atau bilah menu";
 "tasklist.section.scheduled" = "Terjadwal";
 "tasklist.section.manual" = "Manual";
-"tasklist.latest_execution_help" = "Eksekusi terakhir: %@";
 
 /* Repeat Types */
 "repeat.never" = "Tidak Pernah";

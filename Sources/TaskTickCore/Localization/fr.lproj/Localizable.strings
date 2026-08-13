@@ -146,7 +146,6 @@
 "schedule.manual_only.help" = "Ignore le planificateur — s'execute uniquement via le clic droit ou la barre des menus";
 "tasklist.section.scheduled" = "Planifiees";
 "tasklist.section.manual" = "Manuelles";
-"tasklist.latest_execution_help" = "Dernière exécution : %@";
 "repeat.never" = "Jamais";
 "repeat.every_minute" = "Chaque minute";
 "repeat.every_5_minutes" = "Toutes les 5 minutes";

@@ -156,7 +156,6 @@
 "schedule.manual_only.help" = "スケジューラには登録されず、右クリックまたはメニューバーからのみ実行されます";
 "tasklist.section.scheduled" = "スケジュール";
 "tasklist.section.manual" = "手動";
-"tasklist.latest_execution_help" = "最近の実行結果: %@";
 
 /* Repeat Types */
 "repeat.never" = "なし";

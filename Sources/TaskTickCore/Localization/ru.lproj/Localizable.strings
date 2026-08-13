@@ -156,7 +156,6 @@
 "schedule.manual_only.help" = "Пропустить планировщик — запуск только через контекстное меню или строку меню";
 "tasklist.section.scheduled" = "По расписанию";
 "tasklist.section.manual" = "Вручную";
-"tasklist.latest_execution_help" = "Последний запуск: %@";
 
 /* Repeat Types */
 "repeat.never" = "Никогда";
