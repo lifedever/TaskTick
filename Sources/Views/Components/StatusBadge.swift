@@ -6,7 +6,7 @@ struct StatusBadge: View {
     let status: ExecutionStatus
     var compact: Bool = false
 
-    var color: Color {
+    static func color(for status: ExecutionStatus) -> Color {
         switch status {
         case .running: .blue
         case .success: .green
@@ -14,6 +14,10 @@ struct StatusBadge: View {
         case .timeout: .orange
         case .cancelled: .gray
         }
+    }
+
+    var color: Color {
+        Self.color(for: status)
     }
 
     var body: some View {

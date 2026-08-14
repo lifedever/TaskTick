@@ -305,16 +305,6 @@ struct TaskListRow: View {
         isRunning ? .running : latestExecutionStatus
     }
 
-    private func executionStatusColor(_ status: ExecutionStatus) -> Color {
-        switch status {
-        case .running: .blue
-        case .success: .green
-        case .failure: .red
-        case .timeout: .orange
-        case .cancelled: .gray
-        }
-    }
-
     var body: some View {
         HStack(spacing: 10) {
             // Status indicator
@@ -388,7 +378,7 @@ struct TaskListRow: View {
                 // same icons and colours as the "最近执行" list.
                 Image(systemName: status.iconName)
                     .font(.system(size: 12))
-                    .foregroundStyle(executionStatusColor(status))
+                    .foregroundStyle(StatusBadge.color(for: status))
             }
         }
         .padding(.vertical, 3)

@@ -39,7 +39,7 @@ struct LogListView: View {
                         ForEach(ExecutionStatus.allCases, id: \.self) { status in
                             FilterChip(
                                 label: status.displayName,
-                                color: statusColor(status),
+                                color: StatusBadge.color(for: status),
                                 isSelected: statusFilter == status
                             ) {
                                 statusFilter = (statusFilter == status) ? nil : status
@@ -153,15 +153,6 @@ struct LogListView: View {
         selection = successor.map { [$0] } ?? []
     }
 
-    private func statusColor(_ status: ExecutionStatus) -> Color {
-        switch status {
-        case .running: .blue
-        case .success: .green
-        case .failure: .red
-        case .timeout: .orange
-        case .cancelled: .gray
-        }
-    }
 }
 
 struct FilterChip: View {
