@@ -39,7 +39,7 @@ struct LogListView: View {
                         ForEach(ExecutionStatus.allCases, id: \.self) { status in
                             FilterChip(
                                 label: status.displayName,
-                                color: StatusBadge.color(for: status),
+                                color: status.color,
                                 isSelected: statusFilter == status
                             ) {
                                 statusFilter = (statusFilter == status) ? nil : status

@@ -23,7 +23,7 @@ public enum ExecutionStatus: String, Codable, CaseIterable, Sendable {
         case .running: "play.circle.fill"
         case .success: "checkmark.circle.fill"
         case .failure: "xmark.circle.fill"
-        case .timeout: "clock.badge.exclamationmark"
+        case .timeout: "clock.badge.exclamationmark.fill"
         case .cancelled: "stop.circle.fill"
         }
     }

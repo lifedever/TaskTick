@@ -288,10 +288,6 @@ struct TaskListRow: View {
         task.isEnabled ? .green : .gray.opacity(0.35)
     }
 
-    private var runningDotFill: Color { .blue }
-
-    private var runningHaloStroke: Color { .blue.opacity(0.3) }
-
     /// The most recent completed or in-progress execution's status, derived
     /// from the task's execution logs. `nil` when the task has never run.
     private var latestExecutionStatus: ExecutionStatus? {
@@ -301,21 +297,18 @@ struct TaskListRow: View {
             .status
     }
 
-    private var displayedExecutionStatus: ExecutionStatus? {
-        isRunning ? .running : latestExecutionStatus
-    }
-
     var body: some View {
         HStack(spacing: 10) {
-            // Status indicator
+            // Status indicator: the latest execution's icon, same family and
+            // colours as the "最近执行" list (issue #44). Tasks that never
+            // ran fall back to the plain enabled/disabled dot; a disabled
+            // task's icon is dimmed so the enabled/disabled signal survives.
             ZStack {
-                if isRunning {
-                    Circle()
-                        .fill(runningDotFill)
-                        .frame(width: 10, height: 10)
-                    Circle()
-                        .stroke(runningHaloStroke, lineWidth: 2)
-                        .frame(width: 16, height: 16)
+                if let status = isRunning ? .running : latestExecutionStatus {
+                    Image(systemName: status.iconName)
+                        .font(.system(size: 13))
+                        .foregroundStyle(status.color)
+                        .opacity(task.isEnabled || isRunning ? 1 : 0.4)
                 } else {
                     Circle()
                         .fill(statusDotFill)
@@ -373,12 +366,13 @@ struct TaskListRow: View {
 
             Spacer()
 
-            if let status = displayedExecutionStatus {
-                // Latest available execution state, shown right-aligned with the
-                // same icons and colours as the "最近执行" list.
-                Image(systemName: status.iconName)
-                    .font(.system(size: 12))
-                    .foregroundStyle(StatusBadge.color(for: status))
+            if isRunning {
+                ProgressView()
+                    .controlSize(.mini)
+                    // Force white on the selected row — without an explicit
+                    // tint the spinner stays accent-coloured and disappears
+                    // into the selection background.
+                    .tint(isSelected ? Color.white : Color.accentColor)
             }
         }
         .padding(.vertical, 3)
