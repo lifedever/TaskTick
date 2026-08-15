@@ -85,6 +85,9 @@ struct TaskEditorView: View {
     @State private var notifyOnFailure = true
     @State private var notifyOnAction = false
     @State private var notifyOnlyWhenOutput = false
+    @State private var barkPushEnabled = false
+    @State private var barkNotifyOnOutputChange = false
+    @AppStorage("barkServerURL") private var barkServerURL = ""
     @State private var strongReminder = false
     @State private var ignoreExitCode = false
 
@@ -866,6 +869,34 @@ struct TaskEditorView: View {
             }
 
             Section {
+                Toggle(isOn: $barkPushEnabled) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L10n.tr("editor.notify_bark"))
+                        Text(isBarkURLConfigured
+                             ? L10n.tr("editor.notify_bark.hint")
+                             : L10n.tr("editor.notify_bark.missing_url"))
+                            .font(.caption)
+                            .foregroundStyle(isBarkURLConfigured ? Color.secondary : Color.orange)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                Toggle(isOn: $barkNotifyOnOutputChange) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L10n.tr("editor.notify_bark.on_output_change"))
+                        if barkPushEnabled && barkNotifyOnOutputChange {
+                            Text(L10n.tr("editor.notify_bark.on_output_change.hint"))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+                .disabled(!barkPushEnabled)
+            } header: {
+                Text(L10n.tr("settings.bark"))
+            }
+
+            Section {
                 Toggle(L10n.tr("editor.strong_reminder"), isOn: $strongReminder)
             } footer: {
                 Text(L10n.tr("editor.strong_reminder_hint"))
@@ -887,6 +918,10 @@ struct TaskEditorView: View {
                 }
             }
         }
+    }
+
+    private var isBarkURLConfigured: Bool {
+        BarkPushManager.normalizedURL(from: barkServerURL) != nil
     }
 
     // MARK: - Script Validation
@@ -1122,6 +1157,8 @@ struct TaskEditorView: View {
         notifyOnFailure = true
         notifyOnAction = false
         notifyOnlyWhenOutput = false
+        barkPushEnabled = false
+        barkNotifyOnOutputChange = false
         strongReminder = false
         ignoreExitCode = false
         selectedTab = 0
@@ -1151,6 +1188,8 @@ struct TaskEditorView: View {
         notifyOnFailure = task.notifyOnFailure
         notifyOnAction = task.notifyOnAction
         notifyOnlyWhenOutput = task.notifyOnlyWhenOutput
+        barkPushEnabled = task.barkPushEnabled
+        barkNotifyOnOutputChange = task.barkNotifyOnOutputChange
         strongReminder = task.strongReminder
         ignoreExitCode = task.ignoreExitCode
         repeatType = task.repeatType
@@ -1213,6 +1252,8 @@ struct TaskEditorView: View {
         target.notifyOnFailure = notifyOnFailure
         target.notifyOnAction = notifyOnAction
         target.notifyOnlyWhenOutput = notifyOnlyWhenOutput
+        target.barkPushEnabled = barkPushEnabled
+        target.barkNotifyOnOutputChange = barkNotifyOnOutputChange
         target.strongReminder = strongReminder
         target.ignoreExitCode = ignoreExitCode
         target.isEnabled = isEnabled

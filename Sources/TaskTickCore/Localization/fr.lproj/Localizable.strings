@@ -105,6 +105,12 @@
 "editor.notify_only_when_output" = "Notifier uniquement en cas de sortie";
 "editor.notify_only_when_output.hint" = "Lorsque cette option est activée, une exécution réussie sans sortie standard reste silencieuse. Utilisez `echo` uniquement lorsqu'un événement mérite réellement une notification.";
 "editor.notify_hint" = "Les notifications sont envoyées via les notifications système de macOS lorsqu'une tâche se termine.";
+"editor.notify_bark" = "Push Bark";
+"editor.notify_bark.hint" = "Si activé, cette tâche envoie une notification Bark à la fin. L'URL se configure dans Réglages.";
+"editor.notify_bark.on_output_change" = "Uniquement si la sortie change";
+"editor.notify_bark.on_output_change.hint" = "Compare la sortie du script avec l'exécution précédente. Identique → pas de push Bark.";
+"editor.notify_bark.missing_url" = "Aucune URL Bark. Ouvrez Réglages et collez l'URL de l'appareil depuis l'app Bark.";
+"editor.notify_bark.on" = "Activé";
 "editor.strong_reminder" = "Rappel fort en cas de succès";
 "editor.strong_reminder_hint" = "Afficher un panneau flottant avec la sortie complète lorsque la tâche réussit.";
 "editor.strong_reminder_short" = " Rappel fort";
@@ -312,6 +318,19 @@
 "settings.notifications.on_success" = "Notifier en cas de succès";
 "settings.notifications.on_failure" = "Notifier en cas d'échec";
 "settings.notifications.hint" = "Ceci est un paramètre global. Lorsqu'il est désactivé, aucune notification ne sera envoyée même si des tâches individuelles ont les notifications activées.";
+"settings.bark" = "Push Bark";
+"settings.bark.url" = "URL du serveur";
+"settings.bark.url.placeholder" = "https://api.day.app/your_device_key";
+"settings.bark.test" = "Envoyer un test";
+"settings.bark.test.title" = "TaskTick";
+"settings.bark.test.body" = "Le push Bark fonctionne.";
+"settings.bark.test.success" = "Test envoyé";
+"settings.bark.test.success.message" = "Vérifiez sur l'iPhone que Bark a bien reçu la notification.";
+"settings.bark.test.failed" = "Échec du test";
+"settings.bark.test.failed.empty" = "Saisissez d'abord une URL Bark.";
+"settings.bark.test.failed.invalid" = "L'URL Bark est invalide. Utilisez l'URL de l'appareil copiée depuis l'app Bark.";
+"settings.bark.test.failed.http" = "Le serveur Bark a renvoyé HTTP %d.";
+"settings.bark.hint" = "Collez l'URL de l'appareil copiée depuis l'app Bark, ou seulement la clé. Laissez vide pour désactiver Bark globalement. Chaque tâche a son propre interrupteur.";
 /* Backup */
 "settings.backup" = "Sauvegarde";
 "settings.backup.section" = "Sauvegarde automatique";

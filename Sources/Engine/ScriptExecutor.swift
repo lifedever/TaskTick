@@ -120,6 +120,8 @@ final class ScriptExecutor: ObservableObject {
         let notifyOnSuccess = task.notifyOnSuccess
         let notifyOnFailure = task.notifyOnFailure
         let notifyOnlyWhenOutput = task.notifyOnlyWhenOutput
+        let barkPushEnabled = task.barkPushEnabled
+        let barkNotifyOnOutputChange = task.barkNotifyOnOutputChange
         let strongReminder = task.strongReminder
         let logId = log.id
 
@@ -244,15 +246,25 @@ final class ScriptExecutor: ObservableObject {
         let globalNotificationsEnabled = UserDefaults.standard.object(forKey: "notificationsEnabled") as? Bool ?? true
         let durationText = "\(L10n.tr("notification.duration")) \(ExecutionLog.formatDuration(durationMs))"
 
-        if globalNotificationsEnabled && notifyOnFailure && result.status != .success {
+        if result.status != .success {
             let exitInfo = "Exit code: \(result.exitCode ?? -1)"
             let stderrLine = result.stderr.components(separatedBy: .newlines).first(where: { !$0.trimmingCharacters(in: .whitespaces).isEmpty }) ?? ""
             let body = [exitInfo, durationText, stderrLine].filter { !$0.isEmpty }.joined(separator: " · ")
-            NotificationManager.shared.sendNotification(
-                title: "[\(L10n.tr("notification.failed"))] \(taskName)",
-                body: body
+            let title = "[\(L10n.tr("notification.failed"))] \(taskName)"
+            if globalNotificationsEnabled && notifyOnFailure {
+                NotificationManager.shared.sendNotification(title: title, body: body)
+            }
+            sendBarkIfNeeded(
+                enabled: barkPushEnabled,
+                onlyOnChange: barkNotifyOnOutputChange,
+                title: title,
+                body: body,
+                stdout: result.stdout,
+                stderr: result.stderr,
+                task: fetchedTask,
+                modelContext: modelContext
             )
-        } else if globalNotificationsEnabled && notifyOnSuccess && result.status == .success {
+        } else {
             // "Notify only when output present" mode: polling scripts stay silent on
             // empty runs and only chirp when they `echo` something meaningful.
             // Whitespace-only stdout counts as no output (a script ending in a stray
@@ -268,9 +280,20 @@ final class ScriptExecutor: ObservableObject {
                     return !stripped.isEmpty
                 }) ?? ""
                 let body = [durationText, outputLine].filter { !$0.isEmpty }.joined(separator: " · ")
-                NotificationManager.shared.sendNotification(
-                    title: "[\(L10n.tr("notification.succeeded"))] \(taskName)",
-                    body: body.isEmpty ? L10n.tr("notification.success") : body
+                let title = "[\(L10n.tr("notification.succeeded"))] \(taskName)"
+                let resolvedBody = body.isEmpty ? L10n.tr("notification.success") : body
+                if globalNotificationsEnabled && notifyOnSuccess {
+                    NotificationManager.shared.sendNotification(title: title, body: resolvedBody)
+                }
+                sendBarkIfNeeded(
+                    enabled: barkPushEnabled,
+                    onlyOnChange: barkNotifyOnOutputChange,
+                    title: title,
+                    body: resolvedBody,
+                    stdout: result.stdout,
+                    stderr: result.stderr,
+                    task: fetchedTask,
+                    modelContext: modelContext
                 )
             }
         }
@@ -288,6 +311,35 @@ final class ScriptExecutor: ObservableObject {
         }
 
         return log
+    }
+
+    /// Bark is independent of the macOS notification switch. When
+    /// `onlyOnChange` is on, compare this run's output to the last
+    /// fingerprinted run and stay silent if nothing changed.
+    private func sendBarkIfNeeded(
+        enabled: Bool,
+        onlyOnChange: Bool,
+        title: String,
+        body: String,
+        stdout: String,
+        stderr: String,
+        task: ScheduledTask?,
+        modelContext: ModelContext
+    ) {
+        guard enabled else { return }
+        if onlyOnChange {
+            let fingerprint = BarkPushManager.outputFingerprint(stdout: stdout, stderr: stderr)
+            let shouldSend = BarkPushManager.shouldNotifyOnOutputChange(
+                previousFingerprint: task?.lastBarkOutputFingerprint,
+                currentFingerprint: fingerprint
+            )
+            if let task {
+                task.lastBarkOutputFingerprint = fingerprint
+                do { try modelContext.save() } catch { NSLog("⚠️ Bark fingerprint save failed: \(error)") }
+            }
+            guard shouldSend else { return }
+        }
+        BarkPushManager.shared.send(title: title, body: body)
     }
 
     /// Cancel a running task. Hits both the immediate child (zsh) and the

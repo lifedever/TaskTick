@@ -113,6 +113,12 @@
 "editor.notify_only_when_output" = "Уведомлять только при наличии вывода";
 "editor.notify_only_when_output.hint" = "Если включено, успешный запуск без вывода в stdout остаётся беззвучным. Используйте `echo` только тогда, когда действительно произошло что-то, о чём стоит уведомить.";
 "editor.notify_hint" = "Уведомления отправляются через системные уведомления macOS по завершении задачи.";
+"editor.notify_bark" = "Push Bark";
+"editor.notify_bark.hint" = "Если включено, эта задача отправит уведомление Bark по завершении. URL задаётся в настройках.";
+"editor.notify_bark.on_output_change" = "Только при изменении вывода";
+"editor.notify_bark.on_output_change.hint" = "Сравнивает вывод скрипта с прошлым запуском. Одинаковый вывод — без push Bark.";
+"editor.notify_bark.missing_url" = "URL Bark не задан. Откройте настройки и вставьте URL устройства из приложения Bark.";
+"editor.notify_bark.on" = "Вкл.";
 "editor.strong_reminder" = "Усиленное напоминание при успехе";
 "editor.strong_reminder_hint" = "Показать плавающую панель с полным выводом при успешном выполнении задачи.";
 "editor.strong_reminder_short" = " Усиленное напоминание";
@@ -344,6 +350,19 @@
 "settings.notifications.on_success" = "Уведомлять при успехе";
 "settings.notifications.on_failure" = "Уведомлять при ошибке";
 "settings.notifications.hint" = "Это глобальный переключатель. При отключении уведомления не будут отправляться, даже если они включены для отдельных задач.";
+"settings.bark" = "Push Bark";
+"settings.bark.url" = "URL сервера";
+"settings.bark.url.placeholder" = "https://api.day.app/your_device_key";
+"settings.bark.test" = "Отправить тест";
+"settings.bark.test.title" = "TaskTick";
+"settings.bark.test.body" = "Push Bark работает.";
+"settings.bark.test.success" = "Тест отправлен";
+"settings.bark.test.success.message" = "Проверьте на iPhone, что Bark получил уведомление.";
+"settings.bark.test.failed" = "Тест не удался";
+"settings.bark.test.failed.empty" = "Сначала введите URL Bark.";
+"settings.bark.test.failed.invalid" = "URL Bark некорректен. Используйте URL устройства, скопированный из приложения Bark.";
+"settings.bark.test.failed.http" = "Сервер Bark вернул HTTP %d.";
+"settings.bark.hint" = "Вставьте URL устройства из приложения Bark или только ключ. Оставьте пустым, чтобы отключить Bark глобально. У каждой задачи свой переключатель.";
 
 /* Backup */
 "settings.backup" = "Резервное копирование";

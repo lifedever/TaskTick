@@ -219,6 +219,17 @@ public final class ScheduledTask {
     /// "action feedback" banner (Started/Stopped/Restarted). Default `false`
     /// keeps these banners off unless the user opts in per task.
     public var notifyOnAction: Bool = false
+    /// When true, this task sends a Bark push on completion (success and
+    /// failure). The device URL is app-wide (`barkServerURL`); default `false`
+    /// keeps existing tasks unchanged on SwiftData migration.
+    public var barkPushEnabled: Bool = false
+    /// When true (and Bark is on), a completion push is sent only if this
+    /// run's script output differs from the previous run. Default `false`
+    /// keeps existing tasks notifying on every completion.
+    public var barkNotifyOnOutputChange: Bool = false
+    /// SHA-256 of the last compared script output. Runtime only — not
+    /// exported. nil means no previous run has been fingerprinted yet.
+    public var lastBarkOutputFingerprint: String? = nil
     /// Upper bound (seconds) for random scheduling jitter — issue #38. When > 0
     /// every computed fire time gets a deterministic pseudo-random 0...N second
     /// delay so repeats don't hit machine-precise instants. Default 0 keeps

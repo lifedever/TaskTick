@@ -49,6 +49,9 @@ struct TaskExporter {
         /// Per-task schedule time zone (issue #41). Optional for older exports;
         /// nil = follow the system time zone.
         let timeZoneIdentifier: String?
+        /// Per-task Bark push opt-in. Optional so older exports still decode.
+        let barkPushEnabled: Bool?
+        let barkNotifyOnOutputChange: Bool?
     }
 
     /// Export all tasks to a JSON file
@@ -182,7 +185,9 @@ struct TaskExporter {
             }(),
             scheduleType: task.scheduleType,
             jitterSeconds: task.jitterSeconds > 0 ? task.jitterSeconds : nil,
-            timeZoneIdentifier: task.timeZoneIdentifier
+            timeZoneIdentifier: task.timeZoneIdentifier,
+            barkPushEnabled: task.barkPushEnabled,
+            barkNotifyOnOutputChange: task.barkNotifyOnOutputChange
         )
     }
 
@@ -230,6 +235,8 @@ struct TaskExporter {
         if let v = item.strongReminder { task.strongReminder = v }
         if let v = item.ignoreExitCode { task.ignoreExitCode = v }
         if let v = item.notifyOnlyWhenOutput { task.notifyOnlyWhenOutput = v }
+        if let v = item.barkPushEnabled { task.barkPushEnabled = v }
+        if let v = item.barkNotifyOnOutputChange { task.barkNotifyOnOutputChange = v }
         if let v = item.isManualOnly { task.isManualOnly = v }
         if let strings = item.additionalTimes, !strings.isEmpty {
             let comps = strings.compactMap { s -> DateComponents? in

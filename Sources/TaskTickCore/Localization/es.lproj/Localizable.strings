@@ -113,6 +113,12 @@
 "editor.notify_only_when_output" = "Notificar solo si hay salida";
 "editor.notify_only_when_output.hint" = "Al activarse, una ejecución exitosa sin stdout no genera notificación. Usa `echo` solo cuando ocurra algo que valga la pena notificar.";
 "editor.notify_hint" = "Las notificaciones se envían a través del sistema de notificaciones de macOS cuando una tarea finaliza.";
+"editor.notify_bark" = "Push de Bark";
+"editor.notify_bark.hint" = "Si está activado, esta tarea envía una notificación Bark al terminar. La URL se configura en Ajustes.";
+"editor.notify_bark.on_output_change" = "Solo si cambia la salida";
+"editor.notify_bark.on_output_change.hint" = "Compara la salida del script con la ejecución anterior. Si es igual, no hay push Bark.";
+"editor.notify_bark.missing_url" = "No hay URL de Bark. Ábrela en Ajustes y pega la URL del dispositivo de la app Bark.";
+"editor.notify_bark.on" = "Activado";
 "editor.strong_reminder" = "Recordatorio destacado al completar";
 "editor.strong_reminder_hint" = "Mostrar un panel flotante con la salida completa cuando la tarea se ejecuta correctamente.";
 "editor.strong_reminder_short" = " Recordatorio destacado";
@@ -344,6 +350,19 @@
 "settings.notifications.on_success" = "Notificar al completar tarea";
 "settings.notifications.on_failure" = "Notificar al fallar tarea";
 "settings.notifications.hint" = "Este es un interruptor global. Cuando está desactivado, no se enviarán notificaciones de ninguna tarea, incluso si las tareas individuales tienen las notificaciones activadas.";
+"settings.bark" = "Push de Bark";
+"settings.bark.url" = "URL del servidor";
+"settings.bark.url.placeholder" = "https://api.day.app/your_device_key";
+"settings.bark.test" = "Enviar prueba";
+"settings.bark.test.title" = "TaskTick";
+"settings.bark.test.body" = "El push de Bark funciona.";
+"settings.bark.test.success" = "Prueba enviada";
+"settings.bark.test.success.message" = "Comprueba en el iPhone que Bark recibió la notificación.";
+"settings.bark.test.failed" = "La prueba falló";
+"settings.bark.test.failed.empty" = "Introduce primero una URL de Bark.";
+"settings.bark.test.failed.invalid" = "La URL de Bark no es válida. Usa la URL del dispositivo copiada de la app Bark.";
+"settings.bark.test.failed.http" = "El servidor Bark devolvió HTTP %d.";
+"settings.bark.hint" = "Pega la URL del dispositivo copiada de la app Bark, o solo la clave. Déjala vacía para desactivar Bark globalmente. Cada tarea tiene su propio interruptor.";
 
 /* Backup */
 "settings.backup" = "Copia de seguridad";

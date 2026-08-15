@@ -14,6 +14,11 @@ struct SettingsView: View {
 
     // Notifications
     @AppStorage("notificationsEnabled") private var notificationsEnabled = true
+    @AppStorage("barkServerURL") private var barkServerURL = ""
+    @State private var isSendingBarkTest = false
+    @State private var showBarkTestResult = false
+    @State private var barkTestSucceeded = false
+    @State private var barkTestErrorMessage: String?
 
     // Logs
     @AppStorage("logRetentionDays") private var logRetentionDays = 30
@@ -112,6 +117,29 @@ struct SettingsView: View {
                 Text(L10n.tr("settings.notifications.hint"))
             }
 
+            Section {
+                TextField(L10n.tr("settings.bark.url.placeholder"), text: $barkServerURL)
+                    .textFieldStyle(.roundedBorder)
+
+                HStack(spacing: 8) {
+                    Button(L10n.tr("settings.bark.test")) {
+                        sendBarkTest()
+                    }
+                    .disabled(barkServerURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                              || isSendingBarkTest)
+                    .pointerCursor()
+
+                    if isSendingBarkTest {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
+                }
+            } header: {
+                Text(L10n.tr("settings.bark"))
+            } footer: {
+                Text(L10n.tr("settings.bark.hint"))
+            }
+
             Section(L10n.tr("settings.general.defaults")) {
                 Picker(L10n.tr("settings.general.default_shell"), selection: $defaultShell) {
                     ForEach(AvailableShells.load(including: defaultShell), id: \.self) { shell in
@@ -132,6 +160,16 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
+        .alert(barkTestSucceeded
+               ? L10n.tr("settings.bark.test.success")
+               : L10n.tr("settings.bark.test.failed"),
+               isPresented: $showBarkTestResult) {
+            Button("OK") {}
+        } message: {
+            Text(barkTestSucceeded
+                 ? L10n.tr("settings.bark.test.success.message")
+                 : (barkTestErrorMessage ?? L10n.tr("settings.bark.test.failed.invalid")))
+        }
     }
 
     // MARK: - Quick Launcher
@@ -653,6 +691,23 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
+    }
+
+    private func sendBarkTest() {
+        isSendingBarkTest = true
+        Task {
+            let result = await BarkPushManager.shared.sendTest()
+            isSendingBarkTest = false
+            switch result {
+            case .success:
+                barkTestSucceeded = true
+                barkTestErrorMessage = nil
+            case .failure(let error):
+                barkTestSucceeded = false
+                barkTestErrorMessage = error.localizedDescription
+            }
+            showBarkTestResult = true
+        }
     }
 
     private func applyAppearance(_ mode: String) {

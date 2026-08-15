@@ -113,6 +113,12 @@
 "editor.notify_only_when_output" = "출력이 있을 때만 알림";
 "editor.notify_only_when_output.hint" = "활성화하면 실행에 성공했지만 stdout 출력이 없는 경우 알림을 보내지 않습니다. 스크립트가 `echo`로 알릴 만한 정보를 실제로 출력했을 때만 알림이 전송됩니다.";
 "editor.notify_hint" = "작업 완료 시 macOS 시스템 알림으로 전송됩니다.";
+"editor.notify_bark" = "Bark 푸시";
+"editor.notify_bark.hint" = "켜면 이 작업이 완료될 때 Bark 알림을 보냅니다. 주소는 설정에서 입력합니다.";
+"editor.notify_bark.on_output_change" = "출력이 바뀔 때만 알림";
+"editor.notify_bark.on_output_change.hint" = "이번 실행과 이전 실행의 스크립트 출력을 비교합니다. 같으면 Bark를 보내지 않습니다.";
+"editor.notify_bark.missing_url" = "Bark URL이 없습니다. 설정에서 Bark 앱의 기기 URL을 입력하세요.";
+"editor.notify_bark.on" = "켜짐";
 "editor.strong_reminder" = "성공 시 강조 알림";
 "editor.strong_reminder_hint" = "작업 성공 시 전체 출력이 포함된 플로팅 패널을 표시합니다.";
 "editor.strong_reminder_short" = " 강조 알림";
@@ -344,6 +350,19 @@
 "settings.notifications.on_success" = "작업 성공 시 알림";
 "settings.notifications.on_failure" = "작업 실패 시 알림";
 "settings.notifications.hint" = "전역 스위치입니다. 비활성화하면 개별 작업에서 알림이 활성화되어 있어도 알림이 전송되지 않습니다.";
+"settings.bark" = "Bark 푸시";
+"settings.bark.url" = "서버 URL";
+"settings.bark.url.placeholder" = "https://api.day.app/your_device_key";
+"settings.bark.test" = "테스트 보내기";
+"settings.bark.test.title" = "TaskTick";
+"settings.bark.test.body" = "Bark 푸시가 작동합니다.";
+"settings.bark.test.success" = "테스트 푸시를 보냈습니다";
+"settings.bark.test.success.message" = "iPhone에서 Bark 알림을 확인하세요.";
+"settings.bark.test.failed" = "테스트 푸시 실패";
+"settings.bark.test.failed.empty" = "먼저 Bark URL을 입력하세요.";
+"settings.bark.test.failed.invalid" = "Bark URL이 올바르지 않습니다. Bark 앱에서 복사한 기기 URL을 사용하세요.";
+"settings.bark.test.failed.http" = "Bark 서버가 HTTP %d를 반환했습니다.";
+"settings.bark.hint" = "Bark 앱에서 복사한 기기 URL 또는 기기 키를 붙여넣으세요. 비워 두면 전역으로 Bark가 꺼집니다. 각 작업에서 따로 켤 수 있습니다.";
 
 /* Backup */
 "settings.backup" = "백업";

@@ -113,6 +113,12 @@
 "editor.notify_only_when_output" = "Beri Tahu Hanya Jika Ada Output";
 "editor.notify_only_when_output.hint" = "Jika diaktifkan, eksekusi yang berhasil tanpa stdout akan tetap senyap. Gunakan `echo` hanya saat ada sesuatu yang benar-benar layak diberitahukan.";
 "editor.notify_hint" = "Notifikasi dikirim melalui notifikasi sistem macOS saat tugas selesai.";
+"editor.notify_bark" = "Push Bark";
+"editor.notify_bark.hint" = "Jika diaktifkan, tugas ini mengirim notifikasi Bark saat selesai. URL diatur di Pengaturan.";
+"editor.notify_bark.on_output_change" = "Hanya jika keluaran berubah";
+"editor.notify_bark.on_output_change.hint" = "Membandingkan keluaran skrip dengan eksekusi sebelumnya. Sama → tidak ada push Bark.";
+"editor.notify_bark.missing_url" = "URL Bark belum diisi. Buka Pengaturan dan tempel URL perangkat dari aplikasi Bark.";
+"editor.notify_bark.on" = "Aktif";
 "editor.strong_reminder" = "Pengingat Kuat saat Berhasil";
 "editor.strong_reminder_hint" = "Tampilkan panel mengambang dengan output lengkap saat tugas berhasil.";
 "editor.strong_reminder_short" = " Pengingat Kuat";
@@ -344,6 +350,19 @@
 "settings.notifications.on_success" = "Notifikasi saat Tugas Berhasil";
 "settings.notifications.on_failure" = "Notifikasi saat Tugas Gagal";
 "settings.notifications.hint" = "Ini adalah pengaturan global. Jika dinonaktifkan, tidak ada notifikasi tugas yang akan dikirim meskipun tugas individual memiliki notifikasi yang diaktifkan.";
+"settings.bark" = "Push Bark";
+"settings.bark.url" = "URL server";
+"settings.bark.url.placeholder" = "https://api.day.app/your_device_key";
+"settings.bark.test" = "Kirim uji coba";
+"settings.bark.test.title" = "TaskTick";
+"settings.bark.test.body" = "Push Bark berfungsi.";
+"settings.bark.test.success" = "Uji coba terkirim";
+"settings.bark.test.success.message" = "Periksa iPhone untuk memastikan Bark menerima notifikasi.";
+"settings.bark.test.failed" = "Uji coba gagal";
+"settings.bark.test.failed.empty" = "Masukkan URL Bark terlebih dahulu.";
+"settings.bark.test.failed.invalid" = "URL Bark tidak valid. Gunakan URL perangkat yang disalin dari aplikasi Bark.";
+"settings.bark.test.failed.http" = "Server Bark mengembalikan HTTP %d.";
+"settings.bark.hint" = "Tempel URL perangkat dari aplikasi Bark, atau hanya kunci perangkat. Kosongkan untuk menonaktifkan Bark secara global. Setiap tugas punya sakelar sendiri.";
 
 /* Backup */
 "settings.backup" = "Cadangan";

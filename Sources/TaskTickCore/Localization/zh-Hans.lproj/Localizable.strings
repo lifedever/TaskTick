@@ -113,6 +113,12 @@
 "editor.notify_only_when_output" = "仅在有输出时通知";
 "editor.notify_only_when_output.hint" = "开启后，执行成功但脚本没有任何 stdout 输出（例如轮询空跑）将不弹通知；只在脚本通过 `echo` 主动打印业务信息时才通知。";
 "editor.notify_hint" = "任务完成时通过 macOS 系统通知推送。";
+"editor.notify_bark" = "Bark 推送";
+"editor.notify_bark.hint" = "开启后，该任务完成时会发送 Bark 推送。推送地址在 App 设置中填写。";
+"editor.notify_bark.on_output_change" = "仅在输出有变动时通知";
+"editor.notify_bark.on_output_change.hint" = "对比本次与上次的脚本输出。输出相同则不推送 Bark。";
+"editor.notify_bark.missing_url" = "尚未填写 Bark 推送地址，请先到设置中填入 Bark App 里复制的设备地址。";
+"editor.notify_bark.on" = "已开启";
 "editor.strong_reminder" = "成功时强提醒";
 "editor.strong_reminder_hint" = "任务成功后弹出浮动面板，显示完整输出内容。";
 "editor.strong_reminder_short" = "强提醒";
@@ -344,6 +350,19 @@
 "settings.notifications.on_success" = "任务成功时通知";
 "settings.notifications.on_failure" = "任务失败时通知";
 "settings.notifications.hint" = "这是全局开关。关闭后，即使任务单独开启了通知，也不会发送提醒。";
+"settings.bark" = "Bark 推送";
+"settings.bark.url" = "推送地址";
+"settings.bark.url.placeholder" = "https://api.day.app/你的设备 Key";
+"settings.bark.test" = "发送测试";
+"settings.bark.test.title" = "TaskTick";
+"settings.bark.test.body" = "Bark 推送已接通。";
+"settings.bark.test.success" = "测试推送已发送";
+"settings.bark.test.success.message" = "请在 iPhone 上确认是否收到 Bark 通知。";
+"settings.bark.test.failed" = "测试推送失败";
+"settings.bark.test.failed.empty" = "请先填写 Bark 推送地址。";
+"settings.bark.test.failed.invalid" = "Bark 地址格式不正确。请粘贴 Bark App 里复制的设备推送地址。";
+"settings.bark.test.failed.http" = "Bark 服务器返回 HTTP %d。";
+"settings.bark.hint" = "粘贴 Bark App 中复制的设备推送地址，也可以只填设备 Key。留空则全局关闭 Bark。每个任务可单独开关。";
 
 /* 备份 */
 "settings.backup" = "备份";

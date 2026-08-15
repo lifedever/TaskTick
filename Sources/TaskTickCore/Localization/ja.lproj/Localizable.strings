@@ -113,6 +113,12 @@
 "editor.notify_only_when_output" = "出力がある場合のみ通知";
 "editor.notify_only_when_output.hint" = "有効にすると、実行が成功しても stdout に出力がない場合は通知されません。`echo` で実際に通知する価値のある内容が出力されたときのみ通知されます。";
 "editor.notify_hint" = "タスク完了時にmacOSのシステム通知で通知されます。";
+"editor.notify_bark" = "Bark プッシュ";
+"editor.notify_bark.hint" = "有効にすると、このタスクの完了時に Bark 通知を送ります。URL は設定で入力します。";
+"editor.notify_bark.on_output_change" = "出力が変わったときだけ通知";
+"editor.notify_bark.on_output_change.hint" = "今回と前回のスクリプト出力を比較します。同じなら Bark は送りません。";
+"editor.notify_bark.missing_url" = "Bark URL が未設定です。設定で Bark アプリのデバイス URL を入力してください。";
+"editor.notify_bark.on" = "オン";
 "editor.strong_reminder" = "成功時に強調リマインダー";
 "editor.strong_reminder_hint" = "タスク成功時に出力全文を表示するフローティングパネルを表示します。";
 "editor.strong_reminder_short" = " 強調リマインダー";
@@ -344,6 +350,19 @@
 "settings.notifications.on_success" = "タスク成功時に通知";
 "settings.notifications.on_failure" = "タスク失敗時に通知";
 "settings.notifications.hint" = "これはグローバルスイッチです。無効にすると、個別タスクで通知が有効でも通知は送信されません。";
+"settings.bark" = "Bark プッシュ";
+"settings.bark.url" = "サーバー URL";
+"settings.bark.url.placeholder" = "https://api.day.app/your_device_key";
+"settings.bark.test" = "テスト送信";
+"settings.bark.test.title" = "TaskTick";
+"settings.bark.test.body" = "Bark プッシュは動作しています。";
+"settings.bark.test.success" = "テストを送信しました";
+"settings.bark.test.success.message" = "iPhone で Bark 通知を確認してください。";
+"settings.bark.test.failed" = "テスト送信に失敗しました";
+"settings.bark.test.failed.empty" = "先に Bark URL を入力してください。";
+"settings.bark.test.failed.invalid" = "Bark URL が無効です。Bark アプリからコピーしたデバイス URL を使ってください。";
+"settings.bark.test.failed.http" = "Bark サーバーが HTTP %d を返しました。";
+"settings.bark.hint" = "Bark アプリからコピーしたデバイス URL、またはデバイスキーを貼り付けます。空欄にすると全体で Bark が無効になります。各タスクで個別に切り替えられます。";
 
 /* Backup */
 "settings.backup" = "バックアップ";

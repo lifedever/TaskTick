@@ -317,6 +317,14 @@ struct TaskDetailView: View {
                         }
                     }()
                     detailRow(L10n.tr("editor.section.notification"), value: notifyLabel)
+                    if task.barkPushEnabled {
+                        detailRow(
+                            L10n.tr("settings.bark"),
+                            value: task.barkNotifyOnOutputChange
+                                ? L10n.tr("editor.notify_bark.on_output_change")
+                                : L10n.tr("editor.notify_bark.on")
+                        )
+                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

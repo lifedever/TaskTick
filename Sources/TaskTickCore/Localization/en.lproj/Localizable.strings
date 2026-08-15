@@ -113,6 +113,12 @@
 "editor.notify_only_when_output" = "Notify Only When Output Exists";
 "editor.notify_only_when_output.hint" = "When enabled, a successful run with no stdout stays silent. Use `echo` only when something worth notifying actually happened.";
 "editor.notify_hint" = "Notifications are sent via macOS system notifications when a task finishes.";
+"editor.notify_bark" = "Bark Push";
+"editor.notify_bark.hint" = "When enabled, this task sends a Bark notification on completion. Set the Bark URL in Settings.";
+"editor.notify_bark.on_output_change" = "Only When Output Changes";
+"editor.notify_bark.on_output_change.hint" = "Compare this run's script output with the last run. Same output → no Bark push.";
+"editor.notify_bark.missing_url" = "Bark URL is not set. Open Settings to add the device URL from the Bark app.";
+"editor.notify_bark.on" = "On";
 "editor.strong_reminder" = "Strong Reminder on Success";
 "editor.strong_reminder_hint" = "Show a floating panel with full output when the task succeeds.";
 "editor.strong_reminder_short" = " Strong Reminder";
@@ -344,6 +350,19 @@
 "settings.notifications.on_success" = "Notify on Task Success";
 "settings.notifications.on_failure" = "Notify on Task Failure";
 "settings.notifications.hint" = "This is a global switch. When disabled, no task notifications will be sent even if individual tasks have notifications enabled.";
+"settings.bark" = "Bark Push";
+"settings.bark.url" = "Server URL";
+"settings.bark.url.placeholder" = "https://api.day.app/your_device_key";
+"settings.bark.test" = "Send Test";
+"settings.bark.test.title" = "TaskTick";
+"settings.bark.test.body" = "Bark push is working.";
+"settings.bark.test.success" = "Test push sent";
+"settings.bark.test.success.message" = "Check your iPhone to confirm Bark received the notification.";
+"settings.bark.test.failed" = "Test push failed";
+"settings.bark.test.failed.empty" = "Enter a Bark URL first.";
+"settings.bark.test.failed.invalid" = "The Bark URL looks invalid. Use the device URL copied from the Bark app.";
+"settings.bark.test.failed.http" = "Bark server returned HTTP %d.";
+"settings.bark.hint" = "Paste the device URL copied from the Bark app, or just the device key. Leave empty to disable Bark globally. Each task has its own Bark toggle.";
 
 /* Backup */
 "settings.backup" = "Backup";
