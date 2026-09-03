@@ -16,7 +16,12 @@ struct SettingsView: View {
     @AppStorage("notificationsEnabled") private var notificationsEnabled = true
 
     // Logs
-    @AppStorage("logRetentionDays") private var logRetentionDays = 30
+    @AppStorage(ExecutionLogRetentionPolicy.automaticCleanupKey)
+    private var automaticLogCleanup = ExecutionLogRetentionPolicy.defaultAutomaticCleanup
+    @AppStorage(ExecutionLogRetentionPolicy.retentionDaysKey)
+    private var logRetentionDays = ExecutionLogRetentionPolicy.defaultRetentionDays
+    @AppStorage(ExecutionLogRetentionPolicy.maximumLogsPerTaskKey)
+    private var maximumLogsPerTask = ExecutionLogRetentionPolicy.defaultMaximumLogsPerTask
     @AppStorage("logs.streamManualToFile") private var streamManualToFile = true
 
     // Updates
@@ -567,6 +572,11 @@ struct SettingsView: View {
     private var logsTab: some View {
         Form {
             Section(L10n.tr("settings.logs.section")) {
+                Toggle(
+                    L10n.tr("settings.logs.automatic_cleanup"),
+                    isOn: $automaticLogCleanup
+                )
+
                 LabeledContent(L10n.tr("settings.logs.retention")) {
                     HStack(spacing: 6) {
                         TextField("", value: $logRetentionDays, format: .number)
@@ -576,6 +586,13 @@ struct SettingsView: View {
                         Text(L10n.tr("settings.logs.retention.days"))
                             .foregroundStyle(.secondary)
                     }
+                }
+
+                LabeledContent(L10n.tr("settings.logs.maximum_per_task")) {
+                    TextField("", value: $maximumLogsPerTask, format: .number)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 80)
+                        .multilineTextAlignment(.trailing)
                 }
 
                 HStack(spacing: 8) {
@@ -622,7 +639,11 @@ struct SettingsView: View {
                 runLogCleanup()
             }
         } message: {
-            Text(L10n.tr("settings.logs.cleanup.confirm.message", logRetentionDays))
+            Text(L10n.tr(
+                "settings.logs.cleanup.confirm.message",
+                max(logRetentionDays, 0),
+                max(maximumLogsPerTask, 1)
+            ))
         }
         .alert(L10n.tr("settings.logs.cleanup.result.title"), isPresented: $showCleanupResult) {
             Button("OK") {}
@@ -632,40 +653,16 @@ struct SettingsView: View {
     }
 
     private func runLogCleanup() {
-        let days = max(logRetentionDays, 0)
-        let cutoff = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
-        let container = TaskTickApp._sharedModelContainer
-
         isCleaningLogs = true
         Task {
-            // Heavy work on a background ModelContext so the setting window stays
-            // responsive even when the user has accumulated tens of thousands of
-            // execution logs. The background save propagates through the shared
-            // container; main-context @Query subscribers refresh automatically.
-            let deleted = await Task.detached(priority: .userInitiated) {
-                let ctx = ModelContext(container)
-                let descriptor = FetchDescriptor<ExecutionLog>(
-                    predicate: #Predicate { $0.startedAt < cutoff }
-                )
-                guard let logs = try? ctx.fetch(descriptor), !logs.isEmpty else { return 0 }
-                let count = logs.count
-                for log in logs { ctx.delete(log) }
-
-                // Keep each task's stored `executionCount` aligned with its remaining
-                // logs — other UI (detail view badge, end-after-count end condition)
-                // reads from this field and would otherwise show stale totals.
-                if let tasks = try? ctx.fetch(FetchDescriptor<ScheduledTask>()) {
-                    for t in tasks {
-                        t.executionCount = t.executionLogs.filter { $0.modelContext != nil }.count
-                    }
-                }
-                do { try ctx.save() } catch { return 0 }
-                return count
-            }.value
+            let result = await ExecutionLogRetentionManager.shared.runManualCleanup()
 
             isCleaningLogs = false
-            cleanupDeletedCount = deleted
+            cleanupDeletedCount = result.deletedCount
             showCleanupResult = true
+            if result.deletedCount > 0 {
+                TaskScheduler.shared.rebuildSchedule()
+            }
         }
     }
 

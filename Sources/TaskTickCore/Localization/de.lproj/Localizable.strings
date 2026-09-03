@@ -447,9 +447,11 @@
 "settings.logs.section" = "Protokollverwaltung";
 "settings.logs.retention" = "Aufbewahrungsdauer";
 "settings.logs.retention.days" = "Tage";
+"settings.logs.automatic_cleanup" = "Protokolle automatisch bereinigen";
+"settings.logs.maximum_per_task" = "Maximale Protokolle pro Aufgabe";
 "settings.logs.cleanup" = "Alte Protokolle bereinigen";
 "settings.logs.cleanup.confirm.title" = "Alte Protokolle bereinigen?";
-"settings.logs.cleanup.confirm.message" = "Alle Ausführungsprotokolle, die älter als %d Tage sind, werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.";
+"settings.logs.cleanup.confirm.message" = "Ausführungsprotokolle, die älter als %d Tage sind oder die neuesten %d pro Aufgabe überschreiten, werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.";
 "settings.logs.cleanup.cancel" = "Abbrechen";
 "settings.logs.cleanup.confirm" = "Bereinigen";
 "settings.logs.cleanup.result.title" = "Bereinigung abgeschlossen";

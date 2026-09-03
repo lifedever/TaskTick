@@ -98,6 +98,9 @@ final class ScriptExecutor: ObservableObject {
 
         let log = ExecutionLog(task: task, triggeredBy: triggeredBy)
         modelContext.insert(log)
+        // Keep this denormalized counter hot-path friendly. The scheduler and UI
+        // must not fault and walk an unbounded to-many relationship on every run.
+        task.executionCount += 1
         let startTime = Date()
         // Bump the manual-run recency NOW (not at end) so long-running scripts
         // — dev servers, watchers, anything that runs for hours — surface to
@@ -245,11 +248,6 @@ final class ScriptExecutor: ObservableObject {
             // Note: lastManualRunAt is set at task START (above) so running
             // scripts surface immediately. No need to update it again here.
             fetchedTask.updatedAt = endTime
-            // Keep executionCount in sync for both manual and scheduled runs so the UI
-            // badge and any downstream checks reflect actual completed executions.
-            fetchedTask.executionCount = fetchedTask.executionLogs
-                .filter { $0.modelContext != nil }
-                .count
         }
 
         do { try modelContext.save() } catch { NSLog("⚠️ ScriptExecutor save failed: \(error)") }

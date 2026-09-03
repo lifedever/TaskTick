@@ -447,9 +447,11 @@
 "settings.logs.section" = "ログ管理";
 "settings.logs.retention" = "保持期間";
 "settings.logs.retention.days" = "日";
+"settings.logs.automatic_cleanup" = "実行ログを自動的に削除";
+"settings.logs.maximum_per_task" = "タスクごとの最大ログ数";
 "settings.logs.cleanup" = "古いログを削除";
 "settings.logs.cleanup.confirm.title" = "古いログを削除しますか？";
-"settings.logs.cleanup.confirm.message" = "%d 日より前の実行ログはすべて完全に削除されます。この操作は取り消せません。";
+"settings.logs.cleanup.confirm.message" = "%d 日より前、またはタスクごとの最新 %d 件を超える実行ログは完全に削除されます。この操作は取り消せません。";
 "settings.logs.cleanup.cancel" = "キャンセル";
 "settings.logs.cleanup.confirm" = "削除";
 "settings.logs.cleanup.result.title" = "クリーンアップ完了";

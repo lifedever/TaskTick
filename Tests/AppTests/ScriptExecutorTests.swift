@@ -1,5 +1,7 @@
 import Testing
 import Foundation
+import SwiftData
+import TaskTickCore
 @testable import TaskTickApp
 
 @Suite("ScriptExecutor Tests")
@@ -10,6 +12,26 @@ struct ScriptExecutorTests {
     func executorExists() {
         let executor = ScriptExecutor.shared
         #expect(executor != nil)
+    }
+
+    @Test("Executing a task increments its stored log counter")
+    @MainActor
+    func executionIncrementsStoredCounter() async throws {
+        let schema = Schema([ScheduledTask.self, ExecutionLog.self])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: schema, configurations: [configuration])
+        let context = container.mainContext
+        let task = ScheduledTask(name: "counter", scriptBody: "printf ok")
+        task.notifyOnSuccess = false
+        task.notifyOnFailure = false
+        context.insert(task)
+        try context.save()
+
+        let log = await ScriptExecutor.shared.execute(task: task, modelContext: context)
+
+        #expect(log.status == .success)
+        #expect(task.executionCount == 1)
+        #expect(task.executionLogs.count == 1)
     }
 
     /// Reproduces the ipcheck output-truncation bug: runs the same ipcheck

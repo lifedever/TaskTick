@@ -447,9 +447,11 @@
 "settings.logs.section" = "Manajemen Log";
 "settings.logs.retention" = "Periode Penyimpanan";
 "settings.logs.retention.days" = "hari";
+"settings.logs.automatic_cleanup" = "Bersihkan Log Secara Otomatis";
+"settings.logs.maximum_per_task" = "Maksimum Log per Tugas";
 "settings.logs.cleanup" = "Bersihkan Log Lama";
 "settings.logs.cleanup.confirm.title" = "Bersihkan Log Lama?";
-"settings.logs.cleanup.confirm.message" = "Semua log eksekusi yang lebih lama dari %d hari akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.";
+"settings.logs.cleanup.confirm.message" = "Log yang lebih lama dari %d hari atau melebihi %d log terbaru per tugas akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.";
 "settings.logs.cleanup.cancel" = "Batal";
 "settings.logs.cleanup.confirm" = "Bersihkan";
 "settings.logs.cleanup.result.title" = "Pembersihan Selesai";
