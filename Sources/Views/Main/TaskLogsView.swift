@@ -2,18 +2,70 @@ import SwiftUI
 import SwiftData
 import TaskTickCore
 
+/// Per-task log sheet. Thin shell that owns the page size; the list itself
+/// lives in `TaskLogsContent` so its `@Query` can be rebuilt with a bigger
+/// `fetchLimit` each time the user asks for more rows.
 struct TaskLogsView: View {
+    let task: ScheduledTask
+    var initialSelectedLogId: UUID?
+
+    /// Rows loaded per page. A task parked at the 1,000-log retention cap
+    /// used to materialise every row — and every 512 KB stdout — just to open
+    /// this sheet; now it starts at one page and grows on demand.
+    static let pageSize = 50
+
+    @State private var limit = TaskLogsView.pageSize
+
+    var body: some View {
+        TaskLogsContent(
+            task: task,
+            initialSelectedLogId: initialSelectedLogId,
+            limit: limit,
+            onLoadMore: { limit += Self.pageSize }
+        )
+    }
+}
+
+private struct TaskLogsContent: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     let task: ScheduledTask
-    var initialSelectedLogId: UUID?
+    let initialSelectedLogId: UUID?
+    let limit: Int
+    let onLoadMore: () -> Void
+
+    /// Newest `limit` logs straight from the store (see `ExecutionLogQuery`).
+    /// SwiftUI keeps this view's identity across `limit` changes, so
+    /// `selection` survives a "Load more" while the query is re-issued.
+    @Query private var logs: [ExecutionLog]
 
     @State private var selection: Set<ExecutionLog> = []
     @State private var logsToDelete: [ExecutionLog] = []
     @State private var showingDeleteAlert = false
 
+    init(
+        task: ScheduledTask,
+        initialSelectedLogId: UUID?,
+        limit: Int,
+        onLoadMore: @escaping () -> Void
+    ) {
+        self.task = task
+        self.initialSelectedLogId = initialSelectedLogId
+        self.limit = limit
+        self.onLoadMore = onLoadMore
+        _logs = Query(ExecutionLogQuery.recent(taskID: task.id, limit: limit))
+    }
+
+    /// Deleted models linger in `@Query` results until the context saves;
+    /// reading their properties would trap, so drop them up front.
     var sortedLogs: [ExecutionLog] {
-        task.executionLogs.filter { $0.modelContext != nil }.sorted { $0.startedAt > $1.startedAt }
+        logs.filter { $0.modelContext != nil }
+    }
+
+    /// Every log the task has, counted by the store — the loaded page may be
+    /// shorter. Drives the subtitle and the "Load more" row.
+    private var totalCount: Int {
+        ExecutionLogQuery.count(taskID: task.id, in: modelContext) ?? sortedLogs.count
     }
 
     /// The single log driving the detail pane. Multi-select is for bulk
@@ -43,10 +95,16 @@ struct TaskLogsView: View {
         }
         .onAppear {
             guard selection.isEmpty else { return }
-            let initial = initialSelectedLogId.flatMap { id in
+            var initial = initialSelectedLogId.flatMap { id in
                 sortedLogs.first { $0.id == id }
-            } ?? sortedLogs.first
-            if let initial { selection = [initial] }
+            }
+            // The requested log may sit beyond the first page; look it up
+            // directly so the detail pane still opens on it.
+            if initial == nil, let id = initialSelectedLogId {
+                let byID = FetchDescriptor<ExecutionLog>(predicate: #Predicate { $0.id == id })
+                initial = try? modelContext.fetch(byID).first
+            }
+            if let initial = initial ?? sortedLogs.first { selection = [initial] }
         }
     }
 
@@ -95,39 +153,60 @@ struct TaskLogsView: View {
     }
 
     private var splitView: some View {
-        NavigationSplitView {
-            List(sortedLogs, selection: $selection) { log in
-                HStack(spacing: 8) {
-                    StatusBadge(status: log.status, compact: true)
+        // One count per body evaluation, shared by the subtitle and the
+        // "Load more" row so the two can never disagree.
+        let total = totalCount
+        return NavigationSplitView {
+            List(selection: $selection) {
+                ForEach(sortedLogs) { log in
+                    HStack(spacing: 8) {
+                        StatusBadge(status: log.status, compact: true)
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(log.startedAt.formatted(date: .abbreviated, time: .standard))
-                            .font(.subheadline)
-                        if let ms = log.durationMs {
-                            Text(ExecutionLog.formatDuration(ms))
-                                .font(.caption2)
-                                .foregroundStyle(.tertiary)
-                                .monospacedDigit()
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(log.startedAt.formatted(date: .abbreviated, time: .standard))
+                                .font(.subheadline)
+                            if let ms = log.durationMs {
+                                Text(ExecutionLog.formatDuration(ms))
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                                    .monospacedDigit()
+                            }
+                        }
+
+                        Spacer()
+                    }
+                    .tag(log)
+                    .padding(.vertical, 2)
+                    .contextMenu {
+                        let targets = deleteTargets(rightClicked: log)
+                        Button(deleteMenuTitle(count: targets.count),
+                               systemImage: "trash",
+                               role: .destructive) {
+                            logsToDelete = targets
+                            showingDeleteAlert = true
                         }
                     }
-
-                    Spacer()
                 }
-                .tag(log)
-                .padding(.vertical, 2)
-                .contextMenu {
-                    let targets = deleteTargets(rightClicked: log)
-                    Button(deleteMenuTitle(count: targets.count),
-                           systemImage: "trash",
-                           role: .destructive) {
-                        logsToDelete = targets
-                        showingDeleteAlert = true
+
+                // A full page came back and the store holds more — offer the
+                // next page instead of fetching the rest up front.
+                if total > limit {
+                    Button {
+                        onLoadMore()
+                    } label: {
+                        Text(L10n.tr("log.load_more", total - limit))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity)
                     }
+                    .buttonStyle(.borderless)
+                    .pointerCursor()
+                    .selectionDisabled()
                 }
             }
             .frame(minWidth: 240)
             .navigationTitle(task.name)
-            .navigationSubtitle("\(sortedLogs.count) \(L10n.tr("log.count_suffix"))")
+            .navigationSubtitle("\(total) \(L10n.tr("log.count_suffix"))")
             .toolbar {
                 // Export sits in the cancellation slot so it renders to the
                 // LEFT of Close; Close keeps Esc via an explicit shortcut
@@ -146,7 +225,13 @@ struct TaskLogsView: View {
                             }
                         },
                         onExportAll: {
-                            LogExporter.exportLogs(sortedLogs, nameHint: task.name)
+                            // "All" means every stored log, not just the
+                            // loaded page — a one-off unbounded fetch is
+                            // fine for a user-initiated export.
+                            let all = (try? modelContext.fetch(
+                                ExecutionLogQuery.recent(taskID: task.id, limit: nil)
+                            )) ?? sortedLogs
+                            LogExporter.exportLogs(all, nameHint: task.name)
                         }
                     )
                     .help(L10n.tr("log.export"))

@@ -310,11 +310,14 @@
 
 "log.title" = "実行ログ";
 "log.count_suffix" = "件";
+"log.load_more" = "さらに読み込む（残り %d 件）";
 "log.select.title" = "ログを選択";
 "log.select.description" = "サイドバーからログを選択して詳細を表示してください";
 "log.empty.title" = "ログがありません";
 "log.empty.description" = "タスクを実行すると実行ログが生成されます。";
 "log.filter.all" = "すべて";
+"log.filter.all_tasks" = "すべてのタスク";
+"log.filter.any_status" = "すべての状態";
 "log.detail.title" = "実行詳細";
 "log.detail.trigger" = "トリガー";
 "log.detail.trigger.manual" = "手動";

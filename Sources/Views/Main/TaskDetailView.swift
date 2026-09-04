@@ -7,6 +7,12 @@ struct TaskDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.openWindow) private var openWindow
     let task: ScheduledTask
+    /// The newest ten logs via a bounded store fetch (`ExecutionLogQuery`).
+    /// The cards on the right redraw often and must not sort the whole
+    /// relationship in memory to find them.
+    @Query private var recentLogs: [ExecutionLog]
+    private static let recentLogsLimit = 10
+
     @State private var showingDeleteAlert = false
     @State private var showingClearLogsAlert = false
     @State private var isScriptExpanded = false
@@ -18,8 +24,19 @@ struct TaskDetailView: View {
     @StateObject private var scheduler = TaskScheduler.shared
     @AppStorage("logs.streamManualToFile") private var streamManualToFile = true
 
+    init(task: ScheduledTask) {
+        self.task = task
+        _recentLogs = Query(ExecutionLogQuery.recent(taskID: task.id, limit: Self.recentLogsLimit))
+    }
+
     var isRunning: Bool {
         scheduler.runningTaskIDs.contains(task.id)
+    }
+
+    /// `recentLogs` minus models deleted but not yet saved — reading their
+    /// properties would trap.
+    private var liveRecentLogs: [ExecutionLog] {
+        recentLogs.filter { $0.modelContext != nil }
     }
 
     var body: some View {
@@ -72,16 +89,7 @@ struct TaskDetailView: View {
         .alert(L10n.tr("clear_logs.title"), isPresented: $showingClearLogsAlert) {
             Button(L10n.tr("clear_logs.cancel"), role: .cancel) {}
             Button(L10n.tr("clear_logs.confirm"), role: .destructive) {
-                for log in Array(task.executionLogs) {
-                    modelContext.delete(log)
-                }
-                // Save deletions first so the to-many relationship reflects the empty state
-                // before computeNextRunDate reads executionLogs.count.
-                do { try modelContext.save() } catch { NSLog("⚠️ clear logs save failed: \(error)") }
-                task.executionCount = 0
-                task.nextRunAt = TaskScheduler.shared.computeNextRunDate(for: task)
-                do { try modelContext.save() } catch { NSLog("⚠️ clear logs post-save failed: \(error)") }
-                TaskScheduler.shared.rebuildSchedule()
+                LogDeletion.clearAll(for: task, in: modelContext)
             }
         } message: {
             Text(L10n.tr("clear_logs.message", task.name))
@@ -199,7 +207,7 @@ struct TaskDetailView: View {
                             } label: {
                                 Label(L10n.tr("clear_logs.title"), systemImage: "trash.circle")
                             }
-                            .disabled(task.executionLogs.filter { $0.modelContext != nil }.isEmpty)
+                            .disabled(liveRecentLogs.isEmpty)
                             .pointerCursor()
 
                             Button(role: .destructive) {
@@ -580,10 +588,7 @@ struct TaskDetailView: View {
                     .pointerCursor()
                 }
 
-                let allLogs = task.executionLogs.filter { $0.modelContext != nil }
-                let logs = allLogs
-                    .sorted { $0.startedAt > $1.startedAt }
-                    .prefix(10)
+                let logs = liveRecentLogs
 
                 if logs.isEmpty {
                     HStack {
@@ -601,7 +606,7 @@ struct TaskDetailView: View {
                     }
                 } else {
                     VStack(spacing: 4) {
-                        ForEach(Array(logs)) { log in
+                        ForEach(logs) { log in
                             recentLogRow(log)
                         }
                     }
@@ -684,9 +689,8 @@ struct TaskDetailView: View {
     /// The newest run's captured output, right under the run list — answers
     /// "what did it print this time?" without a trip into the logs sheet.
     private var lastOutputCard: some View {
-        let latest = task.executionLogs
-            .filter { $0.modelContext != nil }
-            .max(by: { $0.startedAt < $1.startedAt })
+        // `recentLogs` is newest-first, so the head is the latest run.
+        let latest = liveRecentLogs.first
         // Prefer stdout, fall back to stderr — the same rule notifications use,
         // so the card and the banner never disagree about "the output".
         let raw: String = latest.map {

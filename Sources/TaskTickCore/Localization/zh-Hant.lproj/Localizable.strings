@@ -310,11 +310,14 @@
 
 "log.title" = "執行日誌";
 "log.count_suffix" = "筆紀錄";
+"log.load_more" = "載入更多（還有 %d 筆）";
 "log.select.title" = "選擇一筆日誌";
 "log.select.description" = "從左側列表選擇一筆執行日誌檢視詳情";
 "log.empty.title" = "尚無日誌";
 "log.empty.description" = "執行任務後這裡會顯示執行紀錄。";
 "log.filter.all" = "全部";
+"log.filter.all_tasks" = "全部任務";
+"log.filter.any_status" = "全部狀態";
 "log.detail.title" = "執行詳情";
 "log.detail.trigger" = "觸發方式";
 "log.detail.trigger.manual" = "手動";

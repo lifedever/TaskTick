@@ -310,11 +310,14 @@
 
 "log.title" = "Log Eksekusi";
 "log.count_suffix" = "catatan";
+"log.load_more" = "Muat lebih banyak (%d tersisa)";
 "log.select.title" = "Pilih Log";
 "log.select.description" = "Pilih entri log dari bilah sisi untuk melihat detail";
 "log.empty.title" = "Belum Ada Log";
 "log.empty.description" = "Jalankan tugas untuk menghasilkan log eksekusi.";
 "log.filter.all" = "Semua";
+"log.filter.all_tasks" = "Semua tugas";
+"log.filter.any_status" = "Semua status";
 "log.detail.title" = "Detail Eksekusi";
 "log.detail.trigger" = "Pemicu";
 "log.detail.trigger.manual" = "Manual";

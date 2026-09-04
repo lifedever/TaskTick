@@ -310,11 +310,14 @@
 
 "log.title" = "执行日志";
 "log.count_suffix" = "条记录";
+"log.load_more" = "加载更多（还有 %d 条）";
 "log.select.title" = "选择一条日志";
 "log.select.description" = "从左侧列表选择一条执行日志查看详情";
 "log.empty.title" = "暂无日志";
 "log.empty.description" = "运行任务后这里会显示执行记录。";
 "log.filter.all" = "全部";
+"log.filter.all_tasks" = "全部任务";
+"log.filter.any_status" = "全部状态";
 "log.detail.title" = "执行详情";
 "log.detail.trigger" = "触发方式";
 "log.detail.trigger.manual" = "手动";

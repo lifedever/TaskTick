@@ -310,11 +310,14 @@
 
 "log.title" = "Ausführungsprotokolle";
 "log.count_suffix" = "Einträge";
+"log.load_more" = "Mehr laden (%d verbleibend)";
 "log.select.title" = "Protokoll auswählen";
 "log.select.description" = "Wähle einen Protokolleintrag in der Seitenleiste aus, um Details anzuzeigen";
 "log.empty.title" = "Noch keine Protokolle";
 "log.empty.description" = "Führe die Aufgabe aus, um Ausführungsprotokolle zu erzeugen.";
 "log.filter.all" = "Alle";
+"log.filter.all_tasks" = "Alle Aufgaben";
+"log.filter.any_status" = "Alle Status";
 "log.detail.title" = "Ausführungsdetails";
 "log.detail.trigger" = "Auslöser";
 "log.detail.trigger.manual" = "Manuell";

@@ -310,11 +310,14 @@
 
 "log.title" = "Execution Logs";
 "log.count_suffix" = "records";
+"log.load_more" = "Load more (%d remaining)";
 "log.select.title" = "Select a Log";
 "log.select.description" = "Select a log entry from the sidebar to view details";
 "log.empty.title" = "No Logs Yet";
 "log.empty.description" = "Run the task to generate execution logs.";
 "log.filter.all" = "All";
+"log.filter.all_tasks" = "All Tasks";
+"log.filter.any_status" = "Any Status";
 "log.detail.title" = "Execution Details";
 "log.detail.trigger" = "Trigger";
 "log.detail.trigger.manual" = "Manual";

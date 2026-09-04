@@ -8,9 +8,9 @@ import TaskTickCore
 /// carries a denormalized `executionCount`, and `computeNextRunDate` reads it
 /// for run-count-limited schedules. Both the counter and next date must be
 /// resynced or a task can stall (thinking it already hit its run cap) or
-/// report a count that no longer matches its logs. The existing "clear all
-/// logs" flows in `TaskListView` / `TaskDetailView` do the same three steps;
-/// this keeps selective delete from drifting out of sync with them.
+/// report a count that no longer matches its logs. Selective delete and the
+/// "clear all logs" flows in `TaskListView` / `TaskDetailView` share those
+/// steps here so they can't drift apart.
 enum LogDeletion {
     /// The row to select once `doomed` is removed from `visible`.
     ///
@@ -54,8 +54,8 @@ enum LogDeletion {
             context.delete(log)
         }
 
-        // Save first so the to-many relationship reflects the deletions
-        // before computeNextRunDate reads executionLogs.count.
+        // Save first so the store reflects the deletions before the counter
+        // is re-read from it and computeNextRunDate consults that counter.
         do {
             try context.save()
         } catch {
@@ -64,7 +64,10 @@ enum LogDeletion {
         }
 
         for task in affected where task.modelContext != nil {
-            task.executionCount = task.executionLogs.filter { $0.modelContext != nil }.count
+            // Counted by the store rather than by faulting every surviving
+            // log; the relationship walk is only the fallback if that fails.
+            task.executionCount = ExecutionLogQuery.count(taskID: task.id, in: context)
+                ?? task.executionLogs.filter { $0.modelContext != nil }.count
             task.nextRunAt = TaskScheduler.shared.computeNextRunDate(for: task)
         }
 
@@ -72,6 +75,38 @@ enum LogDeletion {
             try context.save()
         } catch {
             NSLog("⚠️ delete logs post-save failed: \(error)")
+        }
+
+        TaskScheduler.shared.rebuildSchedule()
+    }
+
+    /// Deletes every log of `task`, then repairs its counter and schedule.
+    ///
+    /// Batched through `ExecutionLogRetention.delete` so peak memory is one
+    /// batch of faulted rows rather than the whole history with its captured
+    /// output. Runs in place on the caller's context — the confirm dialog
+    /// already framed this as a blocking, destructive action.
+    @MainActor
+    static func clearAll(for task: ScheduledTask, in context: ModelContext) {
+        guard task.modelContext != nil else { return }
+        let taskID = task.id
+
+        do {
+            _ = try ExecutionLogRetention.delete(ExecutionLogQuery.all(taskID: taskID), in: context)
+        } catch {
+            NSLog("⚠️ clear logs failed: \(error)")
+        }
+
+        // Resync from the store rather than assuming zero, so a batch that
+        // failed to save can't leave the counter claiming an empty history.
+        task.executionCount = ExecutionLogQuery.count(taskID: taskID, in: context)
+            ?? task.executionLogs.filter { $0.modelContext != nil }.count
+        task.nextRunAt = TaskScheduler.shared.computeNextRunDate(for: task)
+
+        do {
+            try context.save()
+        } catch {
+            NSLog("⚠️ clear logs post-save failed: \(error)")
         }
 
         TaskScheduler.shared.rebuildSchedule()

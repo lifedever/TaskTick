@@ -281,11 +281,14 @@
 "quick_launcher.settings.hint" = "Appuyez sur le raccourci depuis n'importe quelle application pour ouvrir un panneau de recherche et exécuter un script. Cliquez sur le champ du raccourci pour le réenregistrer.";
 "log.title" = "Journaux d'exécution";
 "log.count_suffix" = "enregistrements";
+"log.load_more" = "Charger plus (%d restants)";
 "log.select.title" = "Sélectionnez un journal";
 "log.select.description" = "Sélectionnez une entrée de journal dans la barre latérale pour voir les détails";
 "log.empty.title" = "Aucun journal";
 "log.empty.description" = "Exécutez la tâche pour générer des journaux d'exécution.";
 "log.filter.all" = "Tous";
+"log.filter.all_tasks" = "Toutes les tâches";
+"log.filter.any_status" = "Tous les états";
 "log.detail.title" = "Détails de l'exécution";
 "log.detail.trigger" = "Déclencheur";
 "log.detail.trigger.manual" = "Manuel";

@@ -310,11 +310,14 @@
 
 "log.title" = "실행 로그";
 "log.count_suffix" = "건";
+"log.load_more" = "더 불러오기 (%d개 남음)";
 "log.select.title" = "로그 선택";
 "log.select.description" = "사이드바에서 로그 항목을 선택하여 세부 정보를 확인하세요";
 "log.empty.title" = "로그가 없습니다";
 "log.empty.description" = "작업을 실행하면 실행 로그가 생성됩니다.";
 "log.filter.all" = "전체";
+"log.filter.all_tasks" = "모든 작업";
+"log.filter.any_status" = "모든 상태";
 "log.detail.title" = "실행 세부 정보";
 "log.detail.trigger" = "트리거";
 "log.detail.trigger.manual" = "수동";

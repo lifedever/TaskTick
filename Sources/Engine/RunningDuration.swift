@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import TaskTickCore
 
 /// Single source of truth for "this task started its current run at X" — read
@@ -12,11 +13,22 @@ enum RunningDuration {
     /// `nil` if no run is in flight. Picks the most recently started one if
     /// (rarely) more than one are flagged running — that's a defensive
     /// guard for crash-recovered tasks where status didn't get fixed up.
+    ///
+    /// A bounded store fetch rather than a walk over `executionLogs`: this
+    /// runs inside view bodies, and the relationship can hold a thousand
+    /// rows of captured output.
     static func startedAt(for task: ScheduledTask) -> Date? {
-        task.executionLogs
-            .filter { $0.status == .running && $0.finishedAt == nil }
-            .max(by: { $0.startedAt < $1.startedAt })?
-            .startedAt
+        guard let context = task.modelContext else { return nil }
+        let taskID = task.id
+        let runningRaw = ExecutionStatus.running.rawValue
+        var descriptor = FetchDescriptor<ExecutionLog>(
+            predicate: #Predicate {
+                $0.task?.id == taskID && $0.statusRaw == runningRaw && $0.finishedAt == nil
+            },
+            sortBy: [SortDescriptor(\.startedAt, order: .reverse)]
+        )
+        descriptor.fetchLimit = 1
+        return (try? context.fetch(descriptor).first)?.startedAt
     }
 
     /// Compact "Xh Ym Zs" rendering. Auto-collapses zero leading components

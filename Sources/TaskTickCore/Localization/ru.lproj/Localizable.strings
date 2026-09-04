@@ -310,11 +310,14 @@
 
 "log.title" = "Журнал выполнения";
 "log.count_suffix" = "записей";
+"log.load_more" = "Загрузить ещё (осталось %d)";
 "log.select.title" = "Выберите запись";
 "log.select.description" = "Выберите запись в боковой панели для просмотра подробностей";
 "log.empty.title" = "Записей пока нет";
 "log.empty.description" = "Запустите задачу, чтобы создать записи в журнале.";
 "log.filter.all" = "Все";
+"log.filter.all_tasks" = "Все задачи";
+"log.filter.any_status" = "Любой статус";
 "log.detail.title" = "Подробности выполнения";
 "log.detail.trigger" = "Способ запуска";
 "log.detail.trigger.manual" = "Вручную";

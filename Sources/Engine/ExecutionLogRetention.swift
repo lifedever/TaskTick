@@ -124,7 +124,9 @@ enum ExecutionLogRetention {
         return result
     }
 
-    private static func delete(
+    /// Deletes everything `descriptor` matches, 500 rows per fetch-and-save,
+    /// so peak memory is one batch. Shared with `LogDeletion.clearAll`.
+    static func delete(
         _ descriptor: FetchDescriptor<ExecutionLog>,
         in context: ModelContext
     ) throws -> Int {

@@ -310,11 +310,14 @@
 
 "log.title" = "Registri di esecuzione";
 "log.count_suffix" = "registri";
+"log.load_more" = "Carica altri (%d rimanenti)";
 "log.select.title" = "Seleziona un registro";
 "log.select.description" = "Seleziona un registro dalla barra laterale per visualizzarne i dettagli";
 "log.empty.title" = "Nessun registro";
 "log.empty.description" = "Esegui l'attività per generare i registri di esecuzione.";
 "log.filter.all" = "Tutti";
+"log.filter.all_tasks" = "Tutte le attività";
+"log.filter.any_status" = "Qualsiasi stato";
 "log.detail.title" = "Dettagli esecuzione";
 "log.detail.trigger" = "Attivazione";
 "log.detail.trigger.manual" = "Manuale";

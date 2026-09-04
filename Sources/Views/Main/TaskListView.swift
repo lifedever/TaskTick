@@ -103,16 +103,7 @@ struct TaskListView: View {
                     Button(L10n.tr("clear_logs.cancel"), role: .cancel) {}
                     Button(L10n.tr("clear_logs.confirm"), role: .destructive) {
                         if let task = taskToClearLogs {
-                            for log in Array(task.executionLogs) {
-                                modelContext.delete(log)
-                            }
-                            // Save deletions first so to-many relationship reflects the empty state
-                            // before computeNextRunDate reads executionLogs.count.
-                            do { try modelContext.save() } catch { NSLog("⚠️ clear logs save failed: \(error)") }
-                            task.executionCount = 0
-                            task.nextRunAt = TaskScheduler.shared.computeNextRunDate(for: task)
-                            do { try modelContext.save() } catch { NSLog("⚠️ clear logs post-save failed: \(error)") }
-                            TaskScheduler.shared.rebuildSchedule()
+                            LogDeletion.clearAll(for: task, in: modelContext)
                         }
                     }
                 } message: {
@@ -240,7 +231,9 @@ struct TaskListView: View {
                 taskToClearLogs = task
                 showingClearLogsAlert = true
             }
-            .disabled(task.executionLogs.filter { $0.modelContext != nil }.isEmpty)
+            // The denormalised counter is resynced by every delete path, so
+            // the menu doesn't need to fault the relationship to know.
+            .disabled(task.executionCount == 0)
             Button(L10n.tr("task.detail.delete"), systemImage: "trash", role: .destructive) {
                 taskToDelete = task
                 showingDeleteAlert = true
@@ -313,6 +306,18 @@ struct TaskListRow: View {
     /// destroyed. The dot reads fine against the accent background.
     let isSelected: Bool
 
+    /// The newest log only, via a `fetchLimit = 1` store query. Rows redraw
+    /// constantly and a busy task can hold a thousand logs, each with up to
+    /// 512 KB of output — walking `executionLogs` here faulted all of it.
+    @Query private var latestLogs: [ExecutionLog]
+
+    init(task: ScheduledTask, isRunning: Bool, isSelected: Bool) {
+        self.task = task
+        self.isRunning = isRunning
+        self.isSelected = isSelected
+        _latestLogs = Query(ExecutionLogQuery.recent(taskID: task.id, limit: 1))
+    }
+
     private static let relativeFormatter: RelativeDateTimeFormatter = {
         let f = RelativeDateTimeFormatter()
         f.unitsStyle = .short
@@ -338,10 +343,7 @@ struct TaskListRow: View {
     /// The most recent completed or in-progress execution's status, derived
     /// from the task's execution logs. `nil` when the task has never run.
     private var latestExecutionStatus: ExecutionStatus? {
-        task.executionLogs
-            .filter { $0.modelContext != nil }
-            .max { $0.startedAt < $1.startedAt }?
-            .status
+        latestLogs.first { $0.modelContext != nil }?.status
     }
 
     var body: some View {
