@@ -447,9 +447,11 @@
 "settings.logs.section" = "日誌管理";
 "settings.logs.retention" = "保留期限";
 "settings.logs.retention.days" = "天";
+"settings.logs.automatic_cleanup" = "自動清理執行日誌";
+"settings.logs.maximum_per_task" = "每個任務最多保留";
 "settings.logs.cleanup" = "清理歷史日誌";
 "settings.logs.cleanup.confirm.title" = "清理歷史日誌？";
-"settings.logs.cleanup.confirm.message" = "早於 %d 天的執行日誌將被永久刪除，此操作無法復原。";
+"settings.logs.cleanup.confirm.message" = "早於 %d 天或超出每個任務最新 %d 筆的執行日誌將被永久刪除，此操作無法復原。";
 "settings.logs.cleanup.cancel" = "取消";
 "settings.logs.cleanup.confirm" = "清理";
 "settings.logs.cleanup.result.title" = "清理完成";

@@ -120,6 +120,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ScriptExecutor.shared.cancelAll(graceful: 0.2)
         TaskScheduler.shared.stop()
         TaskScheduler.shared.stopAdoptionPoll()
+        ExecutionLogRetentionManager.shared.stop()
         do {
             try TaskTickApp._sharedModelContainer.mainContext.save()
         } catch {

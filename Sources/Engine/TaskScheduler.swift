@@ -225,14 +225,12 @@ final class TaskScheduler: ObservableObject {
 
         runningTaskIDs.insert(taskId)
 
-        // Sync executionCount with actual log count, skipping invalidated references
-        let validLogCount = task.executionLogs.filter { $0.modelContext != nil }.count
-        task.executionCount = validLogCount + 1 // +1 for current execution
-
         // Check end repeat count directly before computing next date
+        // ScriptExecutor increments executionCount when it inserts this run's log.
+        let nextExecutionCount = task.executionCount + 1
         if task.endRepeatType == .afterCount,
            let maxCount = task.endRepeatCount,
-           task.executionCount >= maxCount {
+           nextExecutionCount >= maxCount {
             task.nextRunAt = nil
             task.isEnabled = false
         } else {
@@ -284,10 +282,9 @@ final class TaskScheduler: ObservableObject {
         }
 
         // Check end repeat count first (applies to all schedule types)
-        // Use executionLogs.count as source of truth for completed executions
         if task.endRepeatType == .afterCount,
            let maxCount = task.endRepeatCount,
-           task.executionLogs.filter({ $0.modelContext != nil }).count >= maxCount {
+           task.executionCount >= maxCount {
             return nil
         }
         if task.endRepeatType == .onDate,
@@ -425,7 +422,7 @@ final class TaskScheduler: ObservableObject {
             return candidate
         case .afterCount:
             if let maxCount = task.endRepeatCount,
-               task.executionLogs.filter({ $0.modelContext != nil }).count >= maxCount {
+               task.executionCount >= maxCount {
                 return nil
             }
             return candidate
@@ -477,7 +474,7 @@ final class TaskScheduler: ObservableObject {
         }
 
         var occurrenceDay = calendar.startOfDay(for: scheduledDate)
-        let logCount = task.executionLogs.filter { $0.modelContext != nil }.count
+        let logCount = task.executionCount
 
         // ~2 years of daily steps, ~15 years of weekly. Pathological configs
         // (e.g. end-on-date in the distant past with stride misaligned) bail

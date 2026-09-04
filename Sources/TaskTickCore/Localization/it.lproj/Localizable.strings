@@ -447,9 +447,11 @@
 "settings.logs.section" = "Gestione registri";
 "settings.logs.retention" = "Periodo di conservazione";
 "settings.logs.retention.days" = "giorni";
+"settings.logs.automatic_cleanup" = "Elimina automaticamente i registri";
+"settings.logs.maximum_per_task" = "Registri massimi per attività";
 "settings.logs.cleanup" = "Elimina registri vecchi";
 "settings.logs.cleanup.confirm.title" = "Eliminare i registri vecchi?";
-"settings.logs.cleanup.confirm.message" = "Tutti i registri di esecuzione più vecchi di %d giorni verranno eliminati definitivamente. L'azione non può essere annullata.";
+"settings.logs.cleanup.confirm.message" = "I registri più vecchi di %d giorni o oltre i %d più recenti per attività verranno eliminati definitivamente. L'azione non può essere annullata.";
 "settings.logs.cleanup.cancel" = "Annulla";
 "settings.logs.cleanup.confirm" = "Elimina";
 "settings.logs.cleanup.result.title" = "Pulizia completata";

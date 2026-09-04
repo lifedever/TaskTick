@@ -447,9 +447,11 @@
 "settings.logs.section" = "Управление журналом";
 "settings.logs.retention" = "Срок хранения";
 "settings.logs.retention.days" = "дней";
+"settings.logs.automatic_cleanup" = "Автоматически очищать журналы";
+"settings.logs.maximum_per_task" = "Максимум журналов на задачу";
 "settings.logs.cleanup" = "Очистить старые записи";
 "settings.logs.cleanup.confirm.title" = "Очистить старые записи?";
-"settings.logs.cleanup.confirm.message" = "Все записи о выполнении старше %d дней будут удалены навсегда. Это действие нельзя отменить.";
+"settings.logs.cleanup.confirm.message" = "Записи старше %d дней или сверх последних %d на задачу будут удалены навсегда. Это действие нельзя отменить.";
 "settings.logs.cleanup.cancel" = "Отмена";
 "settings.logs.cleanup.confirm" = "Очистить";
 "settings.logs.cleanup.result.title" = "Очистка завершена";

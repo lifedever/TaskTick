@@ -5,8 +5,8 @@ import TaskTickCore
 /// Shared delete path for execution logs removed from the log lists.
 ///
 /// Deleting logs is not just a `modelContext.delete` — `ScheduledTask`
-/// carries a denormalized `executionCount`, and `computeNextRunDate` reads
-/// `executionLogs.count` for run-count-limited schedules. Both must be
+/// carries a denormalized `executionCount`, and `computeNextRunDate` reads it
+/// for run-count-limited schedules. Both the counter and next date must be
 /// resynced or a task can stall (thinking it already hit its run cap) or
 /// report a count that no longer matches its logs. The existing "clear all
 /// logs" flows in `TaskListView` / `TaskDetailView` do the same three steps;

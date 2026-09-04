@@ -20,7 +20,23 @@ struct TaskTickApp: App {
         let container = Self._sharedModelContainer
         let scheduler = TaskScheduler.shared
         scheduler.configure(modelContext: container.mainContext)
-        scheduler.start()
+
+        let logRetention = ExecutionLogRetentionManager.shared
+        logRetention.configure(modelContainer: container)
+        Task { @MainActor in
+            let result = await logRetention.runAutomaticCleanup()
+            if result.deletedCount > 0 {
+                NSLog(
+                    "Automatic log cleanup deleted \(result.deletedCount) log(s) "
+                        + "from \(result.affectedTaskCount) task(s)"
+                )
+            }
+            // Existing stores may contain hundreds of thousands of logs. Do not
+            // let the scheduler touch their relationships until startup cleanup
+            // has reduced them to the configured bounds.
+            scheduler.start()
+            logRetention.startPeriodicCleanup()
+        }
 
         let backup = DatabaseBackup.shared
         backup.configure(storeURL: Self._storeURL, modelContext: container.mainContext)

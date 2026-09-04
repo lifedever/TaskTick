@@ -447,9 +447,11 @@
 "settings.logs.section" = "Log Management";
 "settings.logs.retention" = "Retention Period";
 "settings.logs.retention.days" = "days";
+"settings.logs.automatic_cleanup" = "Clean Up Logs Automatically";
+"settings.logs.maximum_per_task" = "Maximum Logs per Task";
 "settings.logs.cleanup" = "Clean Up Old Logs";
 "settings.logs.cleanup.confirm.title" = "Clean Up Old Logs?";
-"settings.logs.cleanup.confirm.message" = "All execution logs older than %d days will be permanently deleted. This action cannot be undone.";
+"settings.logs.cleanup.confirm.message" = "Execution logs older than %d days or beyond the newest %d logs per task will be permanently deleted. This action cannot be undone.";
 "settings.logs.cleanup.cancel" = "Cancel";
 "settings.logs.cleanup.confirm" = "Clean Up";
 "settings.logs.cleanup.result.title" = "Cleanup Complete";

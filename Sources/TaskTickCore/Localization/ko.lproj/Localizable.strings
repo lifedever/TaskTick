@@ -447,9 +447,11 @@
 "settings.logs.section" = "로그 관리";
 "settings.logs.retention" = "보관 기간";
 "settings.logs.retention.days" = "일";
+"settings.logs.automatic_cleanup" = "실행 로그 자동 정리";
+"settings.logs.maximum_per_task" = "작업당 최대 로그 수";
 "settings.logs.cleanup" = "오래된 로그 정리";
 "settings.logs.cleanup.confirm.title" = "오래된 로그를 정리하시겠습니까?";
-"settings.logs.cleanup.confirm.message" = "%d일보다 오래된 모든 실행 로그가 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.";
+"settings.logs.cleanup.confirm.message" = "%d일보다 오래되었거나 작업당 최신 %d개를 초과한 실행 로그가 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.";
 "settings.logs.cleanup.cancel" = "취소";
 "settings.logs.cleanup.confirm" = "정리";
 "settings.logs.cleanup.result.title" = "정리 완료";

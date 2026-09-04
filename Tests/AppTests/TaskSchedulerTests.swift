@@ -56,6 +56,25 @@ struct TaskSchedulerTests {
         }
     }
 
+    @Test("After-count schedules use the stored execution counter")
+    @MainActor
+    func afterCountUsesStoredExecutionCount() {
+        let task = ScheduledTask(
+            name: "bounded",
+            scriptBody: "echo hi",
+            scheduledDate: Date(),
+            repeatType: .everyMinute,
+            endRepeatType: .afterCount,
+            endRepeatCount: 3
+        )
+        task.executionCount = 3
+
+        #expect(TaskScheduler.shared.computeNextRunDate(for: task) == nil)
+
+        task.executionCount = 2
+        #expect(TaskScheduler.shared.computeNextRunDate(for: task) != nil)
+    }
+
     // Shortcut tasks share the same scheduling pipeline as shell tasks —
     // setting shortcutName must not block computeNextRunDate from picking
     // up a normal repeat schedule.

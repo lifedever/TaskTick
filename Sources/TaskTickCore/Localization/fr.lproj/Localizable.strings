@@ -414,9 +414,11 @@
 "settings.logs.section" = "Gestion des journaux";
 "settings.logs.retention" = "Période de conservation";
 "settings.logs.retention.days" = "jours";
+"settings.logs.automatic_cleanup" = "Nettoyer les journaux automatiquement";
+"settings.logs.maximum_per_task" = "Maximum de journaux par tâche";
 "settings.logs.cleanup" = "Nettoyer les anciens journaux";
 "settings.logs.cleanup.confirm.title" = "Nettoyer les anciens journaux ?";
-"settings.logs.cleanup.confirm.message" = "Tous les journaux d'exécution datant de plus de %d jours seront définitivement supprimés. Cette action est irréversible.";
+"settings.logs.cleanup.confirm.message" = "Les journaux datant de plus de %d jours ou dépassant les %d plus récents par tâche seront définitivement supprimés. Cette action est irréversible.";
 "settings.logs.cleanup.cancel" = "Annuler";
 "settings.logs.cleanup.confirm" = "Nettoyer";
 "settings.logs.cleanup.result.title" = "Nettoyage terminé";

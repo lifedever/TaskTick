@@ -447,9 +447,11 @@
 "settings.logs.section" = "Gestión de registros";
 "settings.logs.retention" = "Período de retención";
 "settings.logs.retention.days" = "días";
+"settings.logs.automatic_cleanup" = "Limpiar registros automáticamente";
+"settings.logs.maximum_per_task" = "Máximo de registros por tarea";
 "settings.logs.cleanup" = "Limpiar registros antiguos";
 "settings.logs.cleanup.confirm.title" = "¿Limpiar registros antiguos?";
-"settings.logs.cleanup.confirm.message" = "Todos los registros de ejecución de más de %d días se eliminarán permanentemente. Esta acción no se puede deshacer.";
+"settings.logs.cleanup.confirm.message" = "Los registros de más de %d días o que superen los %d más recientes por tarea se eliminarán permanentemente. Esta acción no se puede deshacer.";
 "settings.logs.cleanup.cancel" = "Cancelar";
 "settings.logs.cleanup.confirm" = "Limpiar";
 "settings.logs.cleanup.result.title" = "Limpieza completada";
