@@ -7,6 +7,7 @@
 "menubar.next_run" = "Nächste Ausführung";
 "menubar.upcoming" = "Anstehende Aufgaben";
 "menubar.manual_scripts" = "Manuelle Skripte";
+"menubar.more_tasks" = "%d weitere …";
 "menubar.quit" = "Beenden";
 
 /* Task List */
@@ -17,6 +18,7 @@
 "task.sort.last_run" = "Letzte Ausführung";
 "task.sort.ascending" = "Aufsteigend";
 "task.sort.descending" = "Absteigend";
+"task.sort.custom" = "Benutzerdefiniert";
 "task.search.prompt" = "Aufgaben suchen...";
 "task.empty.title" = "Noch keine Aufgaben";
 "task.empty.description" = "Klicke auf +, um deine erste geplante Aufgabe zu erstellen";

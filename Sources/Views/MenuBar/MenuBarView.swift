@@ -12,13 +12,18 @@ struct MenuBarView: View {
     /// Watching the live settings object so the shortcut hint here updates the
     /// instant the user re-records it in Settings — no stale label.
     @ObservedObject private var quickLauncherSettings = QuickLauncherSettings.shared
+    /// Same key as the main window's sort menu — manual scripts here follow
+    /// whatever order the user picked there, including the Custom drag order
+    /// (issue #56: a most-recently-run order kept moving rows under the cursor).
+    @AppStorage("taskSortOption") private var sortOptionRaw = TaskSortOption.lastRunDesc.rawValue
 
     /// Caps tuned for the menu bar surface. Scheduled jobs fire on their
     /// own schedule so the next 3 are usually enough context; manual scripts
-    /// are the day-to-day actions, so they get more room. Combined cap is
-    /// already implicit (3 + 5 = 8), keeping the popover height bounded.
+    /// are the day-to-day actions, so they get more room. Past the manual cap
+    /// a "N more" row points at the main window; the popover has no scroll
+    /// view, so its height follows the row count.
     private static let maxScheduled = 3
-    private static let maxManual = 5
+    private static let maxManual = 10
 
     var upcomingTasks: [ScheduledTask] {
         tasks
@@ -28,16 +33,17 @@ struct MenuBarView: View {
             .map { $0 }
     }
 
+    private var allManualTasks: [ScheduledTask] {
+        let option = TaskSortOption(rawValue: sortOptionRaw) ?? .lastRunDesc
+        return option.sort(tasks.filter { $0.isEnabled && $0.isManualOnly })
+    }
+
     var manualTasks: [ScheduledTask] {
-        tasks
-            .filter { $0.isEnabled && $0.isManualOnly }
-            .sorted {
-                // Most-recently-manually-run first; tasks that have never run
-                // manually fall back to their creation time.
-                ($0.lastManualRunAt ?? $0.createdAt) > ($1.lastManualRunAt ?? $1.createdAt)
-            }
-            .prefix(Self.maxManual)
-            .map { $0 }
+        Array(allManualTasks.prefix(Self.maxManual))
+    }
+
+    var hiddenManualCount: Int {
+        max(allManualTasks.count - Self.maxManual, 0)
     }
 
     @State private var isHoveringHeader = false
@@ -114,6 +120,12 @@ struct MenuBarView: View {
 
                         ForEach(manualTasks) { task in
                             MenuBarTaskRow(task: task, isRunning: scheduler.runningTaskIDs.contains(task.id))
+                        }
+
+                        if hiddenManualCount > 0 {
+                            MenuBarFooterButton(title: L10n.tr("menubar.more_tasks", hiddenManualCount),
+                                                action: openMainWindow)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }

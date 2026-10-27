@@ -7,6 +7,7 @@
 "menubar.next_run" = "Следующий запуск";
 "menubar.upcoming" = "Предстоящие задачи";
 "menubar.manual_scripts" = "Ручные скрипты";
+"menubar.more_tasks" = "Ещё %d…";
 "menubar.quit" = "Выход";
 
 /* Task List */
@@ -17,6 +18,7 @@
 "task.sort.last_run" = "Последний запуск";
 "task.sort.ascending" = "По возрастанию";
 "task.sort.descending" = "По убыванию";
+"task.sort.custom" = "Свой порядок";
 "task.search.prompt" = "Поиск задач...";
 "task.empty.title" = "Задач пока нет";
 "task.empty.description" = "Нажмите +, чтобы создать первую задачу по расписанию";

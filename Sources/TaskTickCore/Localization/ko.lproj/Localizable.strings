@@ -7,6 +7,7 @@
 "menubar.next_run" = "다음 실행";
 "menubar.upcoming" = "예정된 작업";
 "menubar.manual_scripts" = "수동 스크립트";
+"menubar.more_tasks" = "%d개 더…";
 "menubar.quit" = "종료";
 
 /* Task List */
@@ -17,6 +18,7 @@
 "task.sort.last_run" = "마지막 실행";
 "task.sort.ascending" = "오름차순";
 "task.sort.descending" = "내림차순";
+"task.sort.custom" = "사용자 지정";
 "task.search.prompt" = "작업 검색...";
 "task.empty.title" = "작업이 없습니다";
 "task.empty.description" = "+를 클릭하여 첫 번째 예약 작업을 만드세요";

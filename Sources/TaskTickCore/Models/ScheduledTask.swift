@@ -198,6 +198,11 @@ public final class ScheduledTask {
     /// across sidebar / Quick Launcher / menu bar without scheduled cron
     /// jobs constantly churning the order.
     public var lastManualRunAt: Date?
+    /// Position under the "Custom" sort (issue #56), ascending, numbered per
+    /// list section. Default `0` on SwiftData migration — ties fall back to
+    /// newest-created first, so an untouched list (and every task created
+    /// after a drag) lands on top without any creation path assigning it.
+    public var sortOrder: Int = 0
     public var nextRunAt: Date?
     public var workingDirectory: String?
     public var environmentVariablesJSON: String?

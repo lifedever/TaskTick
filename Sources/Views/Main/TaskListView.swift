@@ -41,12 +41,35 @@ struct TaskListView: View {
             let matchesSearch = searchText.isEmpty || task.name.localizedCaseInsensitiveContains(searchText)
             return matchesFilter && matchesSearch
         }
-        let option = TaskSortOption(rawValue: sortOptionRaw) ?? .lastRunDesc
-        return option.sort(filtered)
+        return sortOption.sort(filtered)
     }
+
+    var sortOption: TaskSortOption { TaskSortOption(rawValue: sortOptionRaw) ?? .lastRunDesc }
 
     var scheduledTasks: [ScheduledTask] { filteredTasks.filter { !$0.isManualOnly } }
     var manualTasks: [ScheduledTask] { filteredTasks.filter { $0.isManualOnly } }
+
+    /// Drag-to-reorder is only offered under the Custom sort — under a time
+    /// sort the row would snap straight back to where the timestamp puts it.
+    private func moveAction(manualOnly: Bool, visible: [ScheduledTask]) -> ((IndexSet, Int) -> Void)? {
+        guard sortOption == .custom else { return nil }
+        return { source, destination in
+            let section = TaskSortOption.custom.sort(tasks.filter { $0.isManualOnly == manualOnly })
+            let reordered = TaskSortOption.move(section, visible: visible,
+                                                fromOffsets: source, toOffset: destination)
+            for (index, task) in reordered.enumerated() where task.sortOrder != index {
+                task.sortOrder = index
+            }
+            do {
+                try modelContext.save()
+            } catch {
+                modelContext.rollback()
+                presentErrorAlert(titleKey: "error.save_failed.title",
+                                  messageKey: "error.save_failed.message",
+                                  error: error)
+            }
+        }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -95,6 +118,7 @@ struct TaskListView: View {
                             ForEach(scheduledTasks) { task in
                                 taskRow(task)
                             }
+                            .onMove(perform: moveAction(manualOnly: false, visible: scheduledTasks))
                         }
                     }
                     if !manualTasks.isEmpty {
@@ -102,6 +126,7 @@ struct TaskListView: View {
                             ForEach(manualTasks) { task in
                                 taskRow(task)
                             }
+                            .onMove(perform: moveAction(manualOnly: true, visible: manualTasks))
                         }
                     }
                 }
@@ -182,6 +207,12 @@ struct TaskListView: View {
             Picker(L10n.tr("task.sort.last_run"), selection: $sortOptionRaw) {
                 Text(L10n.tr("task.sort.descending")).tag(TaskSortOption.lastRunDesc.rawValue)
                 Text(L10n.tr("task.sort.ascending")).tag(TaskSortOption.lastRunAsc.rawValue)
+            }
+            .pickerStyle(.inline)
+            Picker(selection: $sortOptionRaw) {
+                Text(L10n.tr("task.sort.custom")).tag(TaskSortOption.custom.rawValue)
+            } label: {
+                EmptyView()
             }
             .pickerStyle(.inline)
         } label: {
@@ -297,6 +328,8 @@ struct TaskListView: View {
         copy.strongReminder = task.strongReminder
         copy.ignoreExitCode = task.ignoreExitCode
         copy.isManualOnly = task.isManualOnly
+        // Same slot as the original; being newer, the copy sorts just above it.
+        copy.sortOrder = task.sortOrder
         modelContext.insert(copy)
         do {
             try modelContext.save()

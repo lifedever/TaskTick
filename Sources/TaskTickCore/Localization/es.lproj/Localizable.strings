@@ -7,6 +7,7 @@
 "menubar.next_run" = "Siguiente ejecución";
 "menubar.upcoming" = "Tareas próximas";
 "menubar.manual_scripts" = "Scripts manuales";
+"menubar.more_tasks" = "%d más…";
 "menubar.quit" = "Salir";
 
 /* Task List */
@@ -17,6 +18,7 @@
 "task.sort.last_run" = "Última ejecución";
 "task.sort.ascending" = "Ascendente";
 "task.sort.descending" = "Descendente";
+"task.sort.custom" = "Personalizado";
 "task.search.prompt" = "Buscar tareas...";
 "task.empty.title" = "No hay tareas";
 "task.empty.description" = "Haz clic en + para crear tu primera tarea programada";

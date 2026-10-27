@@ -7,6 +7,7 @@
 "menubar.next_run" = "次回実行";
 "menubar.upcoming" = "予定タスク";
 "menubar.manual_scripts" = "手動スクリプト";
+"menubar.more_tasks" = "ほか %d 件…";
 "menubar.quit" = "終了";
 
 /* Task List */
@@ -17,6 +18,7 @@
 "task.sort.last_run" = "最終実行";
 "task.sort.ascending" = "昇順";
 "task.sort.descending" = "降順";
+"task.sort.custom" = "カスタム";
 "task.search.prompt" = "タスクを検索...";
 "task.empty.title" = "タスクがありません";
 "task.empty.description" = "＋をクリックして最初のスケジュールタスクを作成しましょう";

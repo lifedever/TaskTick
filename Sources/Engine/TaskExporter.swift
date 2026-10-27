@@ -72,6 +72,9 @@ struct TaskExporter {
         let pushOnlyWhenOutput: Bool?
         let pushTemplateEnabled: Bool?
         let pushTemplate: String?
+        /// Custom-sort position (issue #56). Optional for older exports; nil
+        /// when 0, so tasks never dragged keep their backup hash unchanged.
+        let sortOrder: Int?
     }
 
     /// Export all tasks to a JSON file
@@ -215,7 +218,8 @@ struct TaskExporter {
             pushOnFailure: task.pushOnFailure,
             pushOnlyWhenOutput: task.pushOnlyWhenOutputOverride,
             pushTemplateEnabled: task.pushTemplateEnabledOverride,
-            pushTemplate: task.pushTemplateOverride
+            pushTemplate: task.pushTemplateOverride,
+            sortOrder: task.sortOrder != 0 ? task.sortOrder : nil
         )
     }
 
@@ -290,6 +294,7 @@ struct TaskExporter {
         task.pushOnlyWhenOutputOverride = item.pushOnlyWhenOutput
         task.pushTemplateEnabledOverride = item.pushTemplateEnabled
         task.pushTemplateOverride = item.pushTemplate
+        if let v = item.sortOrder { task.sortOrder = v }
         if let v = item.isManualOnly { task.isManualOnly = v }
         if let strings = item.additionalTimes, !strings.isEmpty {
             let comps = strings.compactMap { s -> DateComponents? in

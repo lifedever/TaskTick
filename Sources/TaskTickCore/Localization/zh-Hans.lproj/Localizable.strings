@@ -7,6 +7,7 @@
 "menubar.next_run" = "下次执行";
 "menubar.upcoming" = "即将执行";
 "menubar.manual_scripts" = "手动脚本";
+"menubar.more_tasks" = "还有 %d 个…";
 "menubar.quit" = "退出";
 
 /* Task List */
@@ -17,6 +18,7 @@
 "task.sort.last_run" = "最后运行时间";
 "task.sort.ascending" = "升序";
 "task.sort.descending" = "降序";
+"task.sort.custom" = "自定义";
 "task.search.prompt" = "搜索任务...";
 "task.empty.title" = "还没有任务";
 "task.empty.description" = "点击 + 创建你的第一个定时任务";

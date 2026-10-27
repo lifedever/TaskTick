@@ -7,6 +7,7 @@
 "menubar.next_run" = "下次執行";
 "menubar.upcoming" = "即將執行";
 "menubar.manual_scripts" = "手動指令稿";
+"menubar.more_tasks" = "還有 %d 個…";
 "menubar.quit" = "結束";
 
 /* Task List */
@@ -17,6 +18,7 @@
 "task.sort.last_run" = "最後運行時間";
 "task.sort.ascending" = "升序";
 "task.sort.descending" = "降序";
+"task.sort.custom" = "自訂";
 "task.search.prompt" = "搜尋任務...";
 "task.empty.title" = "還沒有任務";
 "task.empty.description" = "點擊 + 建立你的第一個排程任務";

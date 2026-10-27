@@ -7,6 +7,7 @@
 "menubar.next_run" = "Next Run";
 "menubar.upcoming" = "Upcoming Tasks";
 "menubar.manual_scripts" = "Manual Scripts";
+"menubar.more_tasks" = "%d more…";
 "menubar.quit" = "Quit";
 
 /* Task List */
@@ -17,6 +18,7 @@
 "task.sort.last_run" = "Last Run";
 "task.sort.ascending" = "Ascending";
 "task.sort.descending" = "Descending";
+"task.sort.custom" = "Custom";
 "task.search.prompt" = "Search tasks...";
 "task.empty.title" = "No Tasks Yet";
 "task.empty.description" = "Click + to create your first scheduled task";

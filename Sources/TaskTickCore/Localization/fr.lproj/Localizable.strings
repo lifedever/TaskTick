@@ -6,6 +6,7 @@
 "menubar.next_run" = "Prochaine exécution";
 "menubar.upcoming" = "Tâches à venir";
 "menubar.manual_scripts" = "Scripts manuels";
+"menubar.more_tasks" = "%d de plus…";
 "menubar.quit" = "Quitter";
 /* Task List */
 "task.filter.all" = "Toutes";
@@ -15,6 +16,7 @@
 "task.sort.last_run" = "Dernière exécution";
 "task.sort.ascending" = "Croissant";
 "task.sort.descending" = "Décroissant";
+"task.sort.custom" = "Personnalisé";
 "task.search.prompt" = "Rechercher des tâches...";
 "task.empty.title" = "Aucune tâche";
 "task.empty.description" = "Cliquez sur + pour créer votre première tâche planifiée";

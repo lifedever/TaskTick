@@ -7,6 +7,7 @@
 "menubar.next_run" = "Eksekusi Berikutnya";
 "menubar.upcoming" = "Tugas Mendatang";
 "menubar.manual_scripts" = "Skrip Manual";
+"menubar.more_tasks" = "%d lainnya…";
 "menubar.quit" = "Keluar";
 
 /* Task List */
@@ -17,6 +18,7 @@
 "task.sort.last_run" = "Terakhir dijalankan";
 "task.sort.ascending" = "Menaik";
 "task.sort.descending" = "Menurun";
+"task.sort.custom" = "Kustom";
 "task.search.prompt" = "Cari tugas...";
 "task.empty.title" = "Belum Ada Tugas";
 "task.empty.description" = "Klik + untuk membuat tugas terjadwal pertama Anda";
