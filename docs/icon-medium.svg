@@ -14,6 +14,12 @@
       <stop offset="100%" stop-color="#525d72"/>
     </linearGradient>
   </defs>
+  <!-- Apple's macOS icon grid: the rounded square is 824 px inside the 1024 canvas, centred,
+       with transparent margin around it. macOS 15 and earlier draw the artwork as is, so a
+       full-bleed square showed ~24% larger than every other Dock icon (issue #57); macOS 26+
+       re-frames icons itself, which is why it looked fine there. -->
+  <g transform="translate(100 100) scale(0.8046875)">
+
 
   <rect width="1024" height="1024" rx="230" fill="url(#bg)"/>
   <rect width="1024" height="1024" rx="230" fill="none" stroke="rgba(70,75,110,0.10)" stroke-width="6"/>
@@ -30,4 +36,5 @@
   <circle cx="774" cy="766" r="132" fill="#22c55e"/>
   <path d="M 724 722 L 786 766 L 724 810" fill="none" stroke="#ffffff" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M 814 812 L 848 812" stroke="#ffffff" stroke-width="32" stroke-linecap="round"/>
+  </g>
 </svg>

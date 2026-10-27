@@ -22,6 +22,12 @@
       <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#1e2430" flood-opacity="0.22"/>
     </filter>
   </defs>
+  <!-- Apple's macOS icon grid: the rounded square is 824 px inside the 1024 canvas, centred,
+       with transparent margin around it. macOS 15 and earlier draw the artwork as is, so a
+       full-bleed square showed ~24% larger than every other Dock icon (issue #57); macOS 26+
+       re-frames icons itself, which is why it looked fine there. -->
+  <g transform="translate(100 100) scale(0.8046875)">
+
 
   <rect width="1024" height="1024" rx="230" fill="url(#bg)"/>
   <rect width="1024" height="1024" rx="230" fill="none" stroke="rgba(70,75,110,0.10)" stroke-width="6"/>
@@ -49,4 +55,5 @@
   <circle cx="774" cy="766" r="130" fill="#22c55e"/>
   <path d="M 726 724 L 784 766 L 726 808" fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M 812 810 L 846 810" stroke="#ffffff" stroke-width="26" stroke-linecap="round"/>
+  </g>
 </svg>
