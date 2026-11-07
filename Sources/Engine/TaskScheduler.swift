@@ -18,6 +18,18 @@ final class TaskScheduler: ObservableObject {
     /// `rebuildSchedule()` defers tasks with `runOnLaunch = true` so the launch
     /// sweep gets the first-fire (and `runMissedExecution` does not double-fire).
     private var hasFiredLaunchTasks = false
+    /// Holds all scheduled firing between a wake and the network coming
+    /// back (issue #58). While it waits, `rebuildSchedule()` and
+    /// `timerFired()` fire nothing; the wait's completion rebuilds.
+    private let wakeNetworkWait = WakeNetworkWait()
+
+    /// A path has to stay usable this long before the post-wake wait ends.
+    static let wakeNetworkSettle: TimeInterval = 3
+    /// Upper bound on the post-wake wait — past it, due tasks run anyway so
+    /// a Mac with no network still runs its local scripts.
+    static let wakeNetworkTimeout: TimeInterval = 60
+    /// How late a scheduled run may start and still count as on time.
+    nonisolated static let onTimeTolerance: TimeInterval = 60
 
     static let shared = TaskScheduler()
 
@@ -61,13 +73,24 @@ final class TaskScheduler: ObservableObject {
         isRunning = false
         hasFiredLaunchTasks = false
         removeSleepWakeObservers()
+        wakeNetworkWait.cancel()
     }
 
     func rebuildSchedule() {
+        rebuildSchedule(overdueGrace: 0)
+    }
+
+    /// `overdueGrace` widens the on-time window by however long the
+    /// post-wake network wait took, so a run that was on time at the moment
+    /// of the wake isn't reclassified as missed (and skipped) just because
+    /// we held it for the network.
+    private func rebuildSchedule(overdueGrace: TimeInterval) {
         masterTimer?.invalidate()
         masterTimer = nil
 
         guard isRunning, let modelContext else { return }
+        // The post-wake wait rebuilds when it ends (issue #58).
+        guard !wakeNetworkWait.isWaiting else { return }
 
         let descriptor = FetchDescriptor<ScheduledTask>(
             predicate: #Predicate { $0.isEnabled }
@@ -87,8 +110,12 @@ final class TaskScheduler: ObservableObject {
             guard let nextRun = task.nextRunAt else { continue }
             if nextRun <= now {
                 let overdueSeconds = now.timeIntervalSince(nextRun)
-                if overdueSeconds <= 60 || task.runMissedExecution {
-                    // On-time (within 60s tolerance) or missed with runMissedExecution enabled
+                if Self.firesOverdueRun(
+                    overdueSeconds: overdueSeconds,
+                    grace: overdueGrace,
+                    runMissedExecution: task.runMissedExecution
+                ) {
+                    // On-time (within tolerance) or missed with runMissedExecution enabled
                     fireTask(task)
                 } else {
                     // Missed execution without runMissedExecution, skip to next
@@ -169,8 +196,22 @@ final class TaskScheduler: ObservableObject {
 
     // MARK: - Private
 
+    /// Whether a run `overdueSeconds` past its slot still fires: on time
+    /// (within `onTimeTolerance`, widened by `grace`), or missed but the
+    /// task opted into `runMissedExecution`.
+    nonisolated static func firesOverdueRun(
+        overdueSeconds: TimeInterval,
+        grace: TimeInterval,
+        runMissedExecution: Bool
+    ) -> Bool {
+        overdueSeconds <= onTimeTolerance + max(grace, 0) || runMissedExecution
+    }
+
     private func timerFired() {
         guard let modelContext else { return }
+        // Defensive: the wait invalidates the timer, but nothing may fire
+        // while it runs (issue #58).
+        guard !wakeNetworkWait.isWaiting else { return }
 
         let now = Date()
         let descriptor = FetchDescriptor<ScheduledTask>(
@@ -184,7 +225,11 @@ final class TaskScheduler: ObservableObject {
 
             if let nextRun = task.nextRunAt, nextRun <= now {
                 let overdueSeconds = now.timeIntervalSince(nextRun)
-                if overdueSeconds <= 60 || task.runMissedExecution {
+                if Self.firesOverdueRun(
+                    overdueSeconds: overdueSeconds,
+                    grace: 0,
+                    runMissedExecution: task.runMissedExecution
+                ) {
                     fireTask(task)
                 } else {
                     // Missed execution without runMissedExecution, skip to next
@@ -531,9 +576,32 @@ final class TaskScheduler: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                // After wake, check for missed tasks
-                self?.rebuildSchedule()
+                self?.handleWake()
             }
+        }
+    }
+
+    /// Issue #58: Wi-Fi is still reassociating when the wake notification
+    /// arrives (~5s on a real lid-open wake), so tasks due on wake would run
+    /// into a dead network. Hold firing until the network is back, then
+    /// rebuild — which also picks up whatever went due while asleep.
+    private func handleWake() {
+        guard isRunning else { return }
+        let wokeAt = Date()
+        masterTimer?.invalidate()
+        masterTimer = nil
+        wakeNetworkWait.start(
+            settle: Self.wakeNetworkSettle,
+            timeout: Self.wakeNetworkTimeout
+        ) { [weak self] outcome in
+            guard let self else { return }
+            if outcome == .timedOut {
+                NSLog("TaskTick: network not back \(Int(Self.wakeNetworkTimeout))s after wake; running due tasks anyway")
+            }
+            // Wall-clock time since the wake includes any sleep that cut
+            // into the wait; the wait itself never exceeds the timeout.
+            let waited = min(max(Date().timeIntervalSince(wokeAt), 0), Self.wakeNetworkTimeout)
+            self.rebuildSchedule(overdueGrace: waited)
         }
     }
 
