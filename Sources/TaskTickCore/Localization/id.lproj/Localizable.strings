@@ -173,6 +173,8 @@
 "schedule.until" = "Hingga %@";
 "schedule.after_n_times" = "%d kali";
 "schedule.run_missed" = "Jalankan Eksekusi yang Terlewat";
+"schedule.missed_section" = "Eksekusi yang Terlewat";
+"schedule.run_missed.help" = "Jika Mac sedang tidur atau TaskTick tidak berjalan saat jadwal tiba, eksekusi dijalankan sekali setelah Mac bangun atau TaskTick dibuka. Jika nonaktif, eksekusi dilewati";
 "schedule.repeat.cron" = "Ekspresi Cron";
 "schedule.jitter" = "Penundaan Acak";
 "schedule.jitter.unit" = "dtk";
@@ -251,6 +253,7 @@
 "status.failure" = "Gagal";
 "status.timeout" = "Waktu Habis";
 "status.cancelled" = "Dibatalkan";
+"status.skipped" = "Dilewati";
 
 /* Logs */
 "notification.duration" = "Durasi:";
@@ -344,6 +347,12 @@
 "log.detail.status" = "Status";
 "log.detail.timeout_notice" = "Batas waktu (%d detik) tercapai — skrip dihentikan paksa";
 "log.detail.timeout_notice_generic" = "Skrip melebihi batas waktu dan dihentikan paksa";
+"log.skipped.asleep" = "Mac sedang tidur saat eksekusi ini dijadwalkan";
+"log.skipped.not_running" = "TaskTick tidak berjalan saat eksekusi ini dijadwalkan";
+"log.skipped.still_running" = "Eksekusi sebelumnya masih berjalan saat eksekusi ini dijadwalkan";
+"log.skipped.late" = "Eksekusi ini tidak dapat dimulai dalam satu menit setelah waktu terjadwal";
+"log.skipped.generic" = "Eksekusi ini tidak dimulai pada waktu terjadwal";
+"log.skipped.hint" = "Aktifkan “%@” untuk tugas ini agar eksekusi yang terlewat dijalankan nanti, bukan dilewati";
 "log.detail.sudo_notice" = "sudo memerlukan kata sandi, tetapi tugas latar belakang tidak memiliki terminal untuk memasukkannya";
 "log.detail.sudo_notice_fix" = "Solusi: jalankan sudo visudo dan tambahkan aturan NOPASSWD untuk perintah tersebut, lalu jalankan tugas ini kembali";
 "log.close" = "Tutup";

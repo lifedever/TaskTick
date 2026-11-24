@@ -697,8 +697,10 @@ struct TaskDetailView: View {
     /// The newest run's captured output, right under the run list — answers
     /// "what did it print this time?" without a trip into the logs sheet.
     private var lastOutputCard: some View {
-        // `recentLogs` is newest-first, so the head is the latest run.
-        let latest = liveRecentLogs.first
+        // `recentLogs` is newest-first, so the head is the latest run. A
+        // skipped run has no output; it shows in the run list above, and this
+        // card keeps showing what the last real run printed.
+        let latest = liveRecentLogs.first { $0.status != .skipped }
         // Prefer stdout, fall back to stderr — the same rule notifications use,
         // so the card and the banner never disagree about "the output".
         let raw: String = latest.map {

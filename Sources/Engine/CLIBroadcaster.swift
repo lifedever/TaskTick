@@ -93,8 +93,11 @@ final class CLIBroadcaster {
     private func mostRecentExitCode(for taskId: UUID) -> Int? {
         // TaskScheduler.modelContext is private; use the app-wide shared container instead.
         let context = TaskTickApp._sharedModelContainer.mainContext
+        // A `.skipped` entry is stamped with its missed slot, which can be
+        // later than the start of the run that just finished (issue #59).
+        let skippedRaw = ExecutionStatus.skipped.rawValue
         var descriptor = FetchDescriptor<ExecutionLog>(
-            predicate: #Predicate { $0.task?.id == taskId },
+            predicate: #Predicate { $0.task?.id == taskId && $0.statusRaw != skippedRaw },
             sortBy: [SortDescriptor(\.startedAt, order: .reverse)]
         )
         descriptor.fetchLimit = 1

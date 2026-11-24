@@ -173,6 +173,8 @@
 "schedule.until" = "%@まで";
 "schedule.after_n_times" = "%d回";
 "schedule.run_missed" = "未実行分を実行";
+"schedule.missed_section" = "未実行分";
+"schedule.run_missed.help" = "予定時刻に Mac がスリープ中、または TaskTick が起動していなかった場合、スリープ解除後または起動後に 1 回実行します。オフの場合はスキップします";
 "schedule.repeat.cron" = "Cron 式";
 "schedule.jitter" = "ランダム遅延";
 "schedule.jitter.unit" = "秒";
@@ -251,6 +253,7 @@
 "status.failure" = "失敗";
 "status.timeout" = "タイムアウト";
 "status.cancelled" = "キャンセル済み";
+"status.skipped" = "スキップ済み";
 
 /* Logs */
 "notification.duration" = "所要時間:";
@@ -344,6 +347,12 @@
 "log.detail.status" = "ステータス";
 "log.detail.timeout_notice" = "タイムアウト上限（%d 秒）に達したため、スクリプトは強制終了されました";
 "log.detail.timeout_notice_generic" = "スクリプトがタイムアウトしたため強制終了されました";
+"log.skipped.asleep" = "予定時刻に Mac がスリープ中だったため、実行されませんでした";
+"log.skipped.not_running" = "予定時刻に TaskTick が起動していなかったため、実行されませんでした";
+"log.skipped.still_running" = "予定時刻に前回の実行がまだ終わっていなかったため、実行されませんでした";
+"log.skipped.late" = "予定時刻から 1 分以内に開始できなかったため、実行されませんでした";
+"log.skipped.generic" = "予定時刻に実行されませんでした";
+"log.skipped.hint" = "タスクの「%@」をオンにすると、今後は未実行分も後から実行されます";
 "log.detail.sudo_notice" = "スクリプト内の sudo にはパスワードの入力が必要ですが、バックグラウンドタスクには入力できるターミナルがありません";
 "log.detail.sudo_notice_fix" = "解決方法：sudo visudo を実行して該当コマンドに NOPASSWD ルールを追加し、タスクを再実行してください";
 "log.close" = "閉じる";

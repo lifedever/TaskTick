@@ -207,7 +207,8 @@ struct TaskEditorView: View {
                 .tag(Tab.push)
         }
         .frame(width: Self.windowWidth())
-        .fixedSize(horizontal: true, vertical: true)
+        // Height comes from `resizableToTabContent` below, not `fixedSize`.
+        .fixedSize(horizontal: true, vertical: false)
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 0) {
                 Divider()
@@ -235,6 +236,11 @@ struct TaskEditorView: View {
             // the form at rest, white in light mode and dark in dark mode.
             .background(Color(nsColor: .windowBackgroundColor))
         }
+        // Short tabs lock the window to their content, as before; a tab taller
+        // than this (schedule, notifications) opens at it and drags up to show
+        // the rest. Applied outside the button bar so the bar is counted in
+        // both ends of the range — inside, its slack let short tabs drag.
+        .resizableToTabContent(defaultHeight: Self.defaultContentHeight)
         // The window's own title (TaskTickApp.swift) is evaluated once when the
         // Scene is declared, so it keeps saying "New Task" even when opened via
         // Edit. Setting it from inside the view re-evaluates with `editorState`,
@@ -284,6 +290,11 @@ struct TaskEditorView: View {
     /// Measured on the live macOS 27 tab bar: each item is its 13pt title plus
     /// ~23pt of padding.
     static let tabItemPadding: CGFloat = 24
+
+    /// Opening height of a tab whose content is taller, Cancel/Save bar
+    /// included: ~520pt of form, so the window stays around 640pt and fits a
+    /// 1280×800-class display. The schedule tab alone used to open ~900pt.
+    static let defaultContentHeight: CGFloat = 580
     /// Room the centered bar needs on each side: the traffic lights end ~80pt
     /// in, plus a gap before the first tab.
     static let titleBarReserve: CGFloat = 96
@@ -336,7 +347,7 @@ struct TaskEditorView: View {
             }
         }
         .formStyle(.grouped)
-        .groupedFormSizing(minHeight: 237)
+        .groupedFormSizing(minHeight: 237, resizable: true)
     }
 
     // MARK: - Schedule Tab
@@ -462,6 +473,23 @@ struct TaskEditorView: View {
             }
             }
 
+            // Its own section with the trade-off spelled out: with it off, a
+            // run that comes due while the Mac sleeps is skipped (issue #59).
+            if useCron || repeatType != .never {
+                Section {
+                    Toggle(isOn: $runMissedExecution) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Label(L10n.tr("schedule.run_missed"), systemImage: "clock.arrow.2.circlepath")
+                            Text(L10n.tr("schedule.run_missed.help"))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                } header: {
+                    Text(L10n.tr("schedule.missed_section"))
+                }
+            }
+
             Section(L10n.tr("schedule.repeat_section")) {
                 Picker(selection: repeatChoice) {
                     Text(RepeatType.never.displayName).tag(RepeatChoice.repeats(.never))
@@ -530,11 +558,7 @@ struct TaskEditorView: View {
                         }
                     }
 
-                    Toggle(isOn: $runMissedExecution) {
-                        Label(L10n.tr("schedule.run_missed"), systemImage: "clock.arrow.2.circlepath")
-                    }
-
-                    LabeledContent(L10n.tr("schedule.jitter")) {
+                    LabeledContent {
                         HStack(spacing: 6) {
                             TextField("", value: $jitterSeconds, format: .number)
                                 .textFieldStyle(.roundedBorder)
@@ -543,6 +567,8 @@ struct TaskEditorView: View {
                             Text(L10n.tr("schedule.jitter.unit"))
                                 .foregroundStyle(.secondary)
                         }
+                    } label: {
+                        Label(L10n.tr("schedule.jitter"), systemImage: "dice")
                     }
 
                     if jitterSeconds > 0 {
@@ -566,7 +592,7 @@ struct TaskEditorView: View {
             } // end !isManualOnly
         }
         .formStyle(.grouped)
-        .groupedFormSizing(minHeight: 428)
+        .groupedFormSizing(minHeight: 428, resizable: true)
         // Schedule DatePickers read wall-clock values in the task's zone —
         // "09:00" with tz Asia/Shanghai means 09:00 Shanghai (issue #41).
         .environment(\.timeZone, editorTimeZone)
@@ -679,7 +705,7 @@ struct TaskEditorView: View {
 
         }
         .formStyle(.grouped)
-        .groupedFormSizing(minHeight: 388)
+        .groupedFormSizing(minHeight: 388, resizable: true)
         .alert(L10n.tr("template.overwrite.title"), isPresented: $showingTemplateOverwriteConfirm) {
             Button(L10n.tr("editor.cancel"), role: .cancel) {
                 pendingTemplate = nil
@@ -738,7 +764,7 @@ struct TaskEditorView: View {
             }
         }
         .formStyle(.grouped)
-        .groupedFormSizing(minHeight: 337)
+        .groupedFormSizing(minHeight: 337, resizable: true)
     }
 
     // MARK: - Template Picker
@@ -1014,7 +1040,7 @@ struct TaskEditorView: View {
             }
         }
         .formStyle(.grouped)
-        .groupedFormSizing(minHeight: 471)
+        .groupedFormSizing(minHeight: 471, resizable: true)
         .onChange(of: shell) { _, newShell in
             if scriptSource == .inline {
                 let newShebang = "#!\(newShell)"
@@ -1143,7 +1169,7 @@ struct TaskEditorView: View {
             .disabled(!pushEnabled)
         }
         .formStyle(.grouped)
-        .groupedFormSizing(minHeight: 423)
+        .groupedFormSizing(minHeight: 423, resizable: true)
     }
 
     /// `nil` on the task means "every channel". The editor materializes that

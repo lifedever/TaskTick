@@ -173,6 +173,8 @@
 "schedule.until" = "%@까지";
 "schedule.after_n_times" = "%d회";
 "schedule.run_missed" = "놓친 실행 수행";
+"schedule.missed_section" = "놓친 실행";
+"schedule.run_missed.help" = "예정 시각에 Mac이 잠자기 상태이거나 TaskTick이 실행 중이 아니었다면, 깨어나거나 실행된 후 한 번 실행합니다. 끄면 건너뜁니다";
 "schedule.repeat.cron" = "Cron 표현식";
 "schedule.jitter" = "무작위 지연";
 "schedule.jitter.unit" = "초";
@@ -251,6 +253,7 @@
 "status.failure" = "실패";
 "status.timeout" = "시간 초과";
 "status.cancelled" = "취소됨";
+"status.skipped" = "건너뜀";
 
 /* Logs */
 "notification.duration" = "소요 시간:";
@@ -344,6 +347,12 @@
 "log.detail.status" = "상태";
 "log.detail.timeout_notice" = "제한 시간(%d초)에 도달하여 스크립트가 강제 종료되었습니다";
 "log.detail.timeout_notice_generic" = "스크립트가 시간 초과되어 강제 종료되었습니다";
+"log.skipped.asleep" = "예정 시각에 Mac이 잠자기 상태여서 실행되지 않았습니다";
+"log.skipped.not_running" = "예정 시각에 TaskTick이 실행 중이 아니어서 실행되지 않았습니다";
+"log.skipped.still_running" = "예정 시각에 이전 실행이 아직 끝나지 않아 실행되지 않았습니다";
+"log.skipped.late" = "예정 시각부터 1분 안에 시작하지 못해 실행되지 않았습니다";
+"log.skipped.generic" = "예정 시각에 실행되지 않았습니다";
+"log.skipped.hint" = "작업의 '%@'을(를) 켜면 앞으로 놓친 실행을 나중에 수행합니다";
 "log.detail.sudo_notice" = "스크립트의 sudo가 비밀번호 입력을 요구하지만, 백그라운드 작업에는 입력할 터미널이 없습니다";
 "log.detail.sudo_notice_fix" = "해결 방법: sudo visudo를 실행하여 해당 명령에 NOPASSWD 규칙을 추가한 뒤 작업을 다시 실행하세요";
 "log.close" = "닫기";

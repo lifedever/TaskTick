@@ -173,6 +173,8 @@
 "schedule.until" = "До %@";
 "schedule.after_n_times" = "%d раз";
 "schedule.run_missed" = "Выполнить пропущенный запуск";
+"schedule.missed_section" = "Пропущенные запуски";
+"schedule.run_missed.help" = "Если в назначенное время Mac был в режиме сна или TaskTick не был запущен, задача выполнится один раз после пробуждения или запуска. Если выключено — запуск пропускается";
 "schedule.repeat.cron" = "Cron-выражение";
 "schedule.jitter" = "Случайная задержка";
 "schedule.jitter.unit" = "с";
@@ -251,6 +253,7 @@
 "status.failure" = "Ошибка";
 "status.timeout" = "Превышен тайм-аут";
 "status.cancelled" = "Отменено";
+"status.skipped" = "Пропущено";
 
 /* Logs */
 "notification.duration" = "Длительность:";
@@ -344,6 +347,12 @@
 "log.detail.status" = "Статус";
 "log.detail.timeout_notice" = "Достигнут лимит тайм-аута (%d с) — скрипт был принудительно завершён";
 "log.detail.timeout_notice_generic" = "Скрипт превысил тайм-аут и был принудительно завершён";
+"log.skipped.asleep" = "В назначенное время Mac был в режиме сна";
+"log.skipped.not_running" = "В назначенное время TaskTick не был запущен";
+"log.skipped.still_running" = "В назначенное время предыдущий запуск ещё не завершился";
+"log.skipped.late" = "Запуск не удалось начать в течение минуты после назначенного времени";
+"log.skipped.generic" = "Запуск не состоялся в назначенное время";
+"log.skipped.hint" = "Включите «%@» для этой задачи, чтобы пропущенные запуски выполнялись позже, а не пропускались";
 "log.detail.sudo_notice" = "sudo в скрипте требует пароль, но у фоновой задачи нет терминала для его ввода";
 "log.detail.sudo_notice_fix" = "Решение: выполните sudo visudo и добавьте правило NOPASSWD для этой команды, затем запустите задачу снова";
 "log.close" = "Закрыть";

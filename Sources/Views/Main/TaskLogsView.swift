@@ -320,6 +320,10 @@ private struct LogDetailContent: View {
                     TimeoutNoticeView(timeoutSeconds: log.task?.timeoutSeconds)
                 }
 
+                if log.status == .skipped {
+                    SkippedNoticeView(log: log)
+                }
+
                 if log.status == .failure, SudoTTYFailure.matches(stderr: log.stderr) {
                     SudoNoticeView()
                 }

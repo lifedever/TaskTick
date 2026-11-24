@@ -110,10 +110,7 @@ enum ExecutionLogRetention {
 
             guard deletedForTask > 0 else { continue }
 
-            let remainingDescriptor = FetchDescriptor<ExecutionLog>(
-                predicate: #Predicate { $0.task?.id == taskID }
-            )
-            task.executionCount = try context.fetchCount(remainingDescriptor)
+            task.executionCount = try context.fetchCount(ExecutionLogQuery.executions(taskID: taskID))
             result.deletedCount += deletedForTask
             result.affectedTaskCount += 1
         }

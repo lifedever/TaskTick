@@ -35,6 +35,22 @@ enum ExecutionLogQuery {
         try? context.fetchCount(all(taskID: taskID))
     }
 
+    /// The logs of `taskID` that stand for an actual run — everything but
+    /// `.skipped` entries (issue #59). This is what `executionCount` mirrors,
+    /// and the after-N end condition counts runs, not missed slots.
+    static func executions(taskID: UUID) -> FetchDescriptor<ExecutionLog> {
+        let skippedRaw = ExecutionStatus.skipped.rawValue
+        return FetchDescriptor<ExecutionLog>(
+            predicate: #Predicate { $0.task?.id == taskID && $0.statusRaw != skippedRaw }
+        )
+    }
+
+    /// Number of actual runs stored for `taskID` — the value to resync
+    /// `executionCount` from. `nil` when the count itself fails.
+    static func executionCount(taskID: UUID, in context: ModelContext) -> Int? {
+        try? context.fetchCount(executions(taskID: taskID))
+    }
+
     // MARK: Any task (the global Logs window)
 
     /// Newest-first logs, optionally narrowed to one task and/or one status.

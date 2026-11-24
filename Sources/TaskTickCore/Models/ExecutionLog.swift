@@ -7,6 +7,12 @@ public enum ExecutionStatus: String, Codable, CaseIterable, Sendable {
     case failure = "failure"
     case timeout = "timeout"
     case cancelled = "cancelled"
+    /// A scheduled run that came due but never started — the Mac was asleep,
+    /// TaskTick wasn't running, … — and the task doesn't opt into
+    /// `runMissedExecution`. Recorded so the history shows the gap instead of
+    /// the next run silently moving a day ahead (issue #59). Never counts as
+    /// an execution: `executionCount` and the after-N end condition ignore it.
+    case skipped = "skipped"
 
     public var displayName: String {
         switch self {
@@ -15,6 +21,7 @@ public enum ExecutionStatus: String, Codable, CaseIterable, Sendable {
         case .failure: L10n.tr("status.failure")
         case .timeout: L10n.tr("status.timeout")
         case .cancelled: L10n.tr("status.cancelled")
+        case .skipped: L10n.tr("status.skipped")
         }
     }
 
@@ -25,6 +32,7 @@ public enum ExecutionStatus: String, Codable, CaseIterable, Sendable {
         case .failure: "xmark.circle.fill"
         case .timeout: "clock.badge.exclamationmark.fill"
         case .cancelled: "stop.circle.fill"
+        case .skipped: "forward.end.circle.fill"
         }
     }
 
@@ -40,6 +48,30 @@ public enum ExecutionStatus: String, Codable, CaseIterable, Sendable {
         switch self {
         case .timeout: 15.0 / 16.0
         default: 1
+        }
+    }
+}
+
+/// Why a due run was skipped instead of run late. Stored on the `.skipped`
+/// log as a raw string so the history can say what happened in the reader's
+/// language, whatever language was active when it was recorded.
+public enum SkipReason: String, Codable, CaseIterable, Sendable {
+    /// The Mac slept through the scheduled time.
+    case asleep = "asleep"
+    /// The scheduled time fell before TaskTick launched.
+    case notRunning = "not_running"
+    /// The task's previous run was still going at the scheduled time.
+    case stillRunning = "still_running"
+    /// TaskTick was running and the Mac awake, but the run didn't start
+    /// within the on-time window (e.g. the main thread was held up).
+    case late = "late"
+
+    public var displayName: String {
+        switch self {
+        case .asleep: L10n.tr("log.skipped.asleep")
+        case .notRunning: L10n.tr("log.skipped.not_running")
+        case .stillRunning: L10n.tr("log.skipped.still_running")
+        case .late: L10n.tr("log.skipped.late")
         }
     }
 }
@@ -82,6 +114,9 @@ public final class ExecutionLog {
     /// to a different process and we must NOT signal it.
     public var processStartTime: String?
 
+    /// `SkipReason` raw value, set only on `.skipped` logs (issue #59).
+    public var skipReasonRaw: String?
+
     public init(
         task: ScheduledTask? = nil,
         triggeredBy: TriggerType = .manual
@@ -101,6 +136,11 @@ public final class ExecutionLog {
     public var triggeredBy: TriggerType {
         get { TriggerType(rawValue: triggeredByRaw) ?? .manual }
         set { triggeredByRaw = newValue.rawValue }
+    }
+
+    public var skipReason: SkipReason? {
+        get { skipReasonRaw.flatMap(SkipReason.init(rawValue:)) }
+        set { skipReasonRaw = newValue?.rawValue }
     }
 
     /// Maximum output size: 512KB

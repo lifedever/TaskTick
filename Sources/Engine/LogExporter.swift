@@ -124,6 +124,9 @@ struct LogExporter {
         lines.append(sep)
         lines.append(field("Task", log.task?.name ?? L10n.tr("log.unknown_task")))
         lines.append(field("Status", log.status.displayName))
+        if log.status == .skipped {
+            lines.append(field("Reason", log.skipReason?.displayName ?? L10n.tr("log.skipped.generic")))
+        }
         lines.append(field("Trigger", log.triggeredBy.displayName))
         lines.append(field("Started", bodyStamp.string(from: log.startedAt)))
         if let finished = log.finishedAt {

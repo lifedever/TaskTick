@@ -11,6 +11,7 @@ extension ExecutionStatus {
         case .failure: .red
         case .timeout: .orange
         case .cancelled: .gray
+        case .skipped: .purple
         }
     }
 }

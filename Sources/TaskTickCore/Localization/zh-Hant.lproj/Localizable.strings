@@ -173,6 +173,8 @@
 "schedule.until" = "截止 %@";
 "schedule.after_n_times" = "%d 次";
 "schedule.run_missed" = "補執行錯過的任務";
+"schedule.missed_section" = "錯過的執行";
+"schedule.run_missed.help" = "到點時 Mac 在睡眠或 TaskTick 沒有開啟，會在喚醒或啟動後補執行一次；關閉時略過";
 "schedule.repeat.cron" = "Cron 表達式";
 "schedule.jitter" = "隨機延遲";
 "schedule.jitter.unit" = "秒";
@@ -251,6 +253,7 @@
 "status.failure" = "失敗";
 "status.timeout" = "逾時";
 "status.cancelled" = "已取消";
+"status.skipped" = "已略過";
 
 /* Logs */
 "notification.duration" = "耗時:";
@@ -344,6 +347,12 @@
 "log.detail.status" = "狀態";
 "log.detail.timeout_notice" = "已達到逾時限制（%d 秒），腳本已被強制終止";
 "log.detail.timeout_notice_generic" = "腳本執行逾時，已被強制終止";
+"log.skipped.asleep" = "到點時 Mac 在睡眠，這次沒有執行";
+"log.skipped.not_running" = "到點時 TaskTick 沒有開啟，這次沒有執行";
+"log.skipped.still_running" = "到點時上一次執行還沒結束，這次沒有執行";
+"log.skipped.late" = "到點後 1 分鐘內沒能開始，這次沒有執行";
+"log.skipped.generic" = "到點時沒能執行，這次已略過";
+"log.skipped.hint" = "開啟任務的「%@」，之後錯過的執行會補上";
 "log.detail.sudo_notice" = "腳本中的 sudo 需要輸入密碼，但背景任務沒有終端機可供輸入";
 "log.detail.sudo_notice_fix" = "解決方法：執行 sudo visudo，為該指令加入 NOPASSWD 免密碼規則，然後重新執行任務";
 "log.close" = "關閉";

@@ -66,8 +66,8 @@ enum LogDeletion {
         for task in affected where task.modelContext != nil {
             // Counted by the store rather than by faulting every surviving
             // log; the relationship walk is only the fallback if that fails.
-            task.executionCount = ExecutionLogQuery.count(taskID: task.id, in: context)
-                ?? task.executionLogs.filter { $0.modelContext != nil }.count
+            task.executionCount = ExecutionLogQuery.executionCount(taskID: task.id, in: context)
+                ?? task.executionLogs.filter { $0.modelContext != nil && $0.status != .skipped }.count
             task.nextRunAt = TaskScheduler.shared.computeNextRunDate(for: task)
         }
 
@@ -99,8 +99,8 @@ enum LogDeletion {
 
         // Resync from the store rather than assuming zero, so a batch that
         // failed to save can't leave the counter claiming an empty history.
-        task.executionCount = ExecutionLogQuery.count(taskID: taskID, in: context)
-            ?? task.executionLogs.filter { $0.modelContext != nil }.count
+        task.executionCount = ExecutionLogQuery.executionCount(taskID: taskID, in: context)
+            ?? task.executionLogs.filter { $0.modelContext != nil && $0.status != .skipped }.count
         task.nextRunAt = TaskScheduler.shared.computeNextRunDate(for: task)
 
         do {

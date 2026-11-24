@@ -173,6 +173,8 @@
 "schedule.until" = "Fino al %@";
 "schedule.after_n_times" = "%d volte";
 "schedule.run_missed" = "Esegui esecuzione mancata";
+"schedule.missed_section" = "Esecuzioni mancate";
+"schedule.run_missed.help" = "Se all'ora prevista il Mac è in stop o TaskTick non è aperto, l'esecuzione avviene una volta al risveglio o all'avvio. Se disattivato, viene saltata";
 "schedule.repeat.cron" = "Espressione cron";
 "schedule.jitter" = "Ritardo casuale";
 "schedule.jitter.unit" = "s";
@@ -251,6 +253,7 @@
 "status.failure" = "Non riuscita";
 "status.timeout" = "Scaduta";
 "status.cancelled" = "Annullata";
+"status.skipped" = "Saltata";
 
 /* Logs */
 "notification.duration" = "Durata:";
@@ -344,6 +347,12 @@
 "log.detail.status" = "Stato";
 "log.detail.timeout_notice" = "Raggiunto il limite di timeout (%d secondi), lo script è stato terminato";
 "log.detail.timeout_notice_generic" = "Lo script ha superato il timeout ed è stato terminato";
+"log.skipped.asleep" = "Il Mac era in stop all'ora prevista per questa esecuzione";
+"log.skipped.not_running" = "TaskTick non era aperto all'ora prevista per questa esecuzione";
+"log.skipped.still_running" = "L'esecuzione precedente era ancora in corso all'ora prevista per questa";
+"log.skipped.late" = "Questa esecuzione non è riuscita a partire entro un minuto dall'ora prevista";
+"log.skipped.generic" = "Questa esecuzione non è partita all'ora prevista";
+"log.skipped.hint" = "Attiva «%@» per questa attività per recuperare le esecuzioni mancate invece di saltarle";
 "log.detail.sudo_notice" = "sudo richiede una password, ma le attività in background non hanno un terminale su cui inserirla";
 "log.detail.sudo_notice_fix" = "Soluzione: esegui sudo visudo e aggiungi una regola NOPASSWD per il comando, poi esegui di nuovo l'attività";
 "log.close" = "Chiudi";

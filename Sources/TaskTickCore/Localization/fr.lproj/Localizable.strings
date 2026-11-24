@@ -163,6 +163,8 @@
 "schedule.until" = "Jusqu'au %@";
 "schedule.after_n_times" = "%d fois";
 "schedule.run_missed" = "Exécuter les exécutions manquées";
+"schedule.missed_section" = "Exécutions manquées";
+"schedule.run_missed.help" = "Si le Mac est en veille ou si TaskTick n'est pas lancé à l'heure prévue, l'exécution a lieu une fois au réveil ou au lancement. Désactivé, elle est ignorée";
 "schedule.repeat.cron" = "Expression cron";
 "schedule.jitter" = "Délai aléatoire";
 "schedule.jitter.unit" = "s";
@@ -233,6 +235,7 @@
 "status.failure" = "Échoué";
 "status.timeout" = "Expiré";
 "status.cancelled" = "Annulé";
+"status.skipped" = "Ignoré";
 "notification.duration" = "Durée :";
 "notification.success" = "Terminé avec succès";
 "notification.succeeded" = "Succès";
@@ -315,6 +318,12 @@
 "log.detail.status" = "Statut";
 "log.detail.timeout_notice" = "Limite de temps (%d secondes) atteinte — le script a été interrompu";
 "log.detail.timeout_notice_generic" = "Le script a dépassé le délai et a été interrompu";
+"log.skipped.asleep" = "Le Mac était en veille à l'heure prévue de cette exécution";
+"log.skipped.not_running" = "TaskTick n'était pas lancé à l'heure prévue de cette exécution";
+"log.skipped.still_running" = "L'exécution précédente était encore en cours à l'heure prévue de celle-ci";
+"log.skipped.late" = "Cette exécution n'a pas pu démarrer dans la minute suivant l'heure prévue";
+"log.skipped.generic" = "Cette exécution n'a pas démarré à l'heure prévue";
+"log.skipped.hint" = "Activez « %@ » pour cette tâche afin de rattraper les exécutions manquées au lieu de les ignorer";
 "log.detail.sudo_notice" = "sudo nécessite un mot de passe, mais les tâches en arrière-plan n'ont pas de terminal pour le saisir";
 "log.detail.sudo_notice_fix" = "Solution : exécutez sudo visudo et ajoutez une règle NOPASSWD pour cette commande, puis relancez la tâche";
 "log.close" = "Fermer";

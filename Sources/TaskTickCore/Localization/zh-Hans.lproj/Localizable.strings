@@ -173,6 +173,8 @@
 "schedule.until" = "截止 %@";
 "schedule.after_n_times" = "%d 次";
 "schedule.run_missed" = "补执行错过的任务";
+"schedule.missed_section" = "错过的执行";
+"schedule.run_missed.help" = "到点时 Mac 在睡眠或 TaskTick 没有运行，会在唤醒或启动后补执行一次；关闭时跳过";
 "schedule.repeat.cron" = "Cron 表达式";
 "schedule.jitter" = "随机延迟";
 "schedule.jitter.unit" = "秒";
@@ -251,6 +253,7 @@
 "status.failure" = "失败";
 "status.timeout" = "超时";
 "status.cancelled" = "已取消";
+"status.skipped" = "已跳过";
 
 /* Logs */
 "notification.duration" = "耗时:";
@@ -344,6 +347,12 @@
 "log.detail.status" = "状态";
 "log.detail.timeout_notice" = "已达到超时限制（%d 秒），脚本被强制终止";
 "log.detail.timeout_notice_generic" = "脚本运行超时，被强制终止";
+"log.skipped.asleep" = "到点时 Mac 在睡眠，这次没有执行";
+"log.skipped.not_running" = "到点时 TaskTick 没有运行，这次没有执行";
+"log.skipped.still_running" = "到点时上一次执行还没结束，这次没有执行";
+"log.skipped.late" = "到点后 1 分钟内没能开始，这次没有执行";
+"log.skipped.generic" = "到点时没能执行，这次已跳过";
+"log.skipped.hint" = "打开任务的「%@」，之后错过的执行会补上";
 "log.detail.sudo_notice" = "脚本中的 sudo 需要输入密码，但后台任务没有终端可供输入";
 "log.detail.sudo_notice_fix" = "解决方法：运行 sudo visudo，为该命令添加 NOPASSWD 免密规则，然后重新运行任务";
 "log.close" = "关闭";

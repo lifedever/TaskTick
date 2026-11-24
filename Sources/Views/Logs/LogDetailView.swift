@@ -93,6 +93,10 @@ struct LogDetailView: View {
                     TimeoutNoticeView(timeoutSeconds: log.task?.timeoutSeconds)
                 }
 
+                if log.status == .skipped {
+                    SkippedNoticeView(log: log)
+                }
+
                 if log.status == .failure, SudoTTYFailure.matches(stderr: log.stderr) {
                     SudoNoticeView()
                 }
@@ -136,13 +140,7 @@ struct LogDetailView: View {
     }
 
     private var statusGradient: LinearGradient {
-        let color: Color = switch log.status {
-        case .running: .blue
-        case .success: .green
-        case .failure: .red
-        case .timeout: .orange
-        case .cancelled: .gray
-        }
+        let color = log.status.color
         return LinearGradient(
             colors: [color, color.opacity(0.7)],
             startPoint: .topLeading,

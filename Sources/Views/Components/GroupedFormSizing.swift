@@ -8,7 +8,8 @@ extension View {
     /// pushing the window off screen.
     ///
     /// Both the Settings and the Task Editor windows are a `TabView` of grouped
-    /// forms sized by `.fixedSize(vertical:)` → `.windowResizability(.contentSize)`.
+    /// forms sized by `.fixedSize(vertical:)` → `.windowResizability(.contentSize)`
+    /// (the editor through `resizable`, see below).
     /// `Form(.grouped)` wraps its rows in a ScrollView, and on macOS 26+ the
     /// ideal height that scroll view reports back up the chain lands roughly
     /// 20pt short of the rows it actually contains. The window therefore opens
@@ -36,13 +37,29 @@ extension View {
     /// screen — its bottom, Save button included, ran off the display with
     /// nothing left to scroll (issue #55). `maxHeight` caps the form at what the
     /// window's screen can show, and past that the form scrolls as usual.
-    func groupedFormSizing(minHeight: CGFloat) -> some View {
-        modifier(GroupedFormSizing(minHeight: minHeight))
+    ///
+    /// `resizable` lets the tab be laid out shorter than its content — the form
+    /// scrolls — while still reporting its content height as the ideal. On its
+    /// own that does nothing; the `TabView` holding such tabs applies
+    /// `resizableToTabContent(defaultHeight:)` to turn it into a window that
+    /// fits short tabs exactly and lets tall ones be dragged.
+    func groupedFormSizing(minHeight: CGFloat, resizable: Bool = false) -> some View {
+        modifier(GroupedFormSizing(minHeight: minHeight, resizable: resizable))
+    }
+
+    /// For a `TabView` whose tabs use `groupedFormSizing(minHeight:resizable: true)`.
+    /// A tab whose content fits in `defaultHeight` locks the window to that
+    /// content height, exactly as `fixedSize` did — switching tabs still snaps
+    /// the window to each one. A taller tab opens at `defaultHeight` and can be
+    /// dragged up to its full content height (or the screen), and back down.
+    func resizableToTabContent(defaultHeight: CGFloat) -> some View {
+        TabContentRange(defaultHeight: defaultHeight) { self }
     }
 }
 
 private struct GroupedFormSizing: ViewModifier {
     let minHeight: CGFloat
+    let resizable: Bool
 
     /// Visible height of the screen the window is on. Seeded from the main
     /// screen so the very first layout is already capped, then replaced by the
@@ -62,15 +79,77 @@ private struct GroupedFormSizing: ViewModifier {
 
     func body(content: Content) -> some View {
         let cap = max(Self.smallestCap, screenHeight - Self.windowChrome)
-        content
-            // min is clamped to the cap: a floor above the ceiling is a
-            // contradictory frame, and the ceiling is the one that matters.
-            .frame(minHeight: min(minHeight, cap), maxHeight: cap)
-            .fixedSize(horizontal: false, vertical: true)
+        sized(content, cap: cap)
             .scrollBounceBehavior(.basedOnSize)
             .background(ScreenFitting { height in
                 if height != screenHeight { screenHeight = height }
             })
+    }
+
+    @ViewBuilder
+    private func sized(_ content: Content, cap: CGFloat) -> some View {
+        if resizable {
+            ShrinkableFormHeight(floor: minHeight, shortest: Self.smallestCap, cap: cap) {
+                content
+            }
+        } else {
+            content
+                // min is clamped to the cap: a floor above the ceiling is a
+                // contradictory frame, and the ceiling is the one that matters.
+                .frame(minHeight: min(minHeight, cap), maxHeight: cap)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+/// A form that reports its content height as its ideal but accepts any height
+/// down to `shortest`, scrolling below its content.
+///
+/// The content height is `max(floor, form's ideal)` — the value `fixedSize`
+/// would lock it to, `floor` covering the ~20pt the grouped form's ideal comes
+/// up short — capped at the screen.
+private struct ShrinkableFormHeight: Layout {
+    let floor: CGFloat
+    let shortest: CGFloat
+    let cap: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard let form = subviews.first else { return .zero }
+        let width = proposal.width ?? form.sizeThatFits(.unspecified).width
+        let natural = min(cap, max(floor, form.sizeThatFits(ProposedViewSize(width: width, height: nil)).height))
+        let lower = min(natural, shortest)
+        let height = proposal.height.map { min(max($0, lower), natural) } ?? natural
+        return CGSize(width: width, height: height)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        subviews.first?.place(at: bounds.origin, proposal: ProposedViewSize(bounds.size))
+    }
+}
+
+/// Turns the selected tab's content height into the window's limits.
+///
+/// A `.contentSize` window takes its minimum from proposing zero and its
+/// maximum from proposing infinity; `TabView` forwards the tab's minimum and
+/// ideal but answers infinity with infinity. So the maximum is the `TabView`'s
+/// ideal (its tab's content height plus its own chrome), and the minimum and
+/// opening height are that, capped at `defaultHeight` — but never under what
+/// the `TabView` can be squeezed to.
+private struct TabContentRange: Layout {
+    let defaultHeight: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard let tabs = subviews.first else { return .zero }
+        let width = proposal.width ?? tabs.sizeThatFits(.unspecified).width
+        let squeezed = tabs.sizeThatFits(ProposedViewSize(width: width, height: 0)).height
+        let upper = max(squeezed, tabs.sizeThatFits(ProposedViewSize(width: width, height: nil)).height)
+        let lower = min(upper, max(squeezed, defaultHeight))
+        let height = proposal.height.map { min(max($0, lower), upper) } ?? lower
+        return CGSize(width: width, height: height)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        subviews.first?.place(at: bounds.origin, proposal: ProposedViewSize(bounds.size))
     }
 }
 

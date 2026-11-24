@@ -22,6 +22,16 @@ final class TaskScheduler: ObservableObject {
     /// back (issue #58). While it waits, `rebuildSchedule()` and
     /// `timerFired()` fire nothing; the wait's completion rebuilds.
     private let wakeNetworkWait = WakeNetworkWait()
+    /// When `start()` last ran. A slot that fell before it was missed because
+    /// TaskTick wasn't running (issue #59).
+    private var startedAt: Date?
+    /// `sleepClock()` at the last schedule rebuild. If it has moved on since,
+    /// the Mac slept in between — that's why a slot is overdue (issue #59).
+    private var sleepClockAtRebuild: TimeInterval?
+    /// Tasks whose scheduled fire was turned away because their previous run
+    /// was still going. The slot only turns into a skip once that run ends,
+    /// by which time `runningTaskIDs` no longer shows why.
+    private var dueWhileRunningTaskIDs: Set<UUID> = []
 
     /// A path has to stay usable this long before the post-wake wait ends.
     static let wakeNetworkSettle: TimeInterval = 3
@@ -30,6 +40,9 @@ final class TaskScheduler: ObservableObject {
     static let wakeNetworkTimeout: TimeInterval = 60
     /// How late a scheduled run may start and still count as on time.
     nonisolated static let onTimeTolerance: TimeInterval = 60
+    /// How far `sleepClock()` has to move between rebuilds to count as a
+    /// sleep rather than clock adjustment noise.
+    nonisolated static let sleepDetectionThreshold: TimeInterval = 5
 
     static let shared = TaskScheduler()
 
@@ -43,6 +56,8 @@ final class TaskScheduler: ObservableObject {
         guard let modelContext else { return }
         guard !isRunning else { return }
         isRunning = true
+        startedAt = Date()
+        sleepClockAtRebuild = Self.sleepClock()
 
         // Compute nextRunAt for all enabled tasks that don't have one
         let descriptor = FetchDescriptor<ScheduledTask>(
@@ -72,6 +87,9 @@ final class TaskScheduler: ObservableObject {
         masterTimer = nil
         isRunning = false
         hasFiredLaunchTasks = false
+        startedAt = nil
+        sleepClockAtRebuild = nil
+        dueWhileRunningTaskIDs.removeAll()
         removeSleepWakeObservers()
         wakeNetworkWait.cancel()
     }
@@ -118,10 +136,7 @@ final class TaskScheduler: ObservableObject {
                     // On-time (within tolerance) or missed with runMissedExecution enabled
                     fireTask(task)
                 } else {
-                    // Missed execution without runMissedExecution, skip to next
-                    let nextDate = computeNextRunDate(for: task, after: now)
-                    task.nextRunAt = nextDate
-                    do { try modelContext.save() } catch { NSLog("⚠️ TaskScheduler save failed: \(error)") }
+                    let nextDate = skipMissedRun(task, dueAt: nextRun, now: now, in: modelContext)
                     if let nextDate, nextDate < (earliest ?? .distantFuture) {
                         earliest = nextDate
                     }
@@ -132,6 +147,10 @@ final class TaskScheduler: ObservableObject {
                 earliest = nextRun
             }
         }
+
+        // Every overdue slot up to now has been judged against the old
+        // reading; sleeps from here on belong to the next rebuild.
+        sleepClockAtRebuild = Self.sleepClock()
 
         guard let fireDate = earliest else { return }
 
@@ -232,15 +251,68 @@ final class TaskScheduler: ObservableObject {
                 ) {
                     fireTask(task)
                 } else {
-                    // Missed execution without runMissedExecution, skip to next
-                    let nextDate = computeNextRunDate(for: task, after: now)
-                    task.nextRunAt = nextDate
-                    do { try modelContext.save() } catch { NSLog("⚠️ TaskScheduler save failed: \(error)") }
+                    skipMissedRun(task, dueAt: nextRun, now: now, in: modelContext)
                 }
             }
         }
 
         rebuildSchedule()
+    }
+
+    /// Wall-clock time minus awake time. `systemUptime` stops while the Mac
+    /// sleeps, so this reading grows by exactly the time spent asleep.
+    nonisolated static func sleepClock() -> TimeInterval {
+        Date().timeIntervalSince1970 - ProcessInfo.processInfo.systemUptime
+    }
+
+    /// Why the slot due at `slot` was missed. Checked in order of how
+    /// specific the evidence is: a slot before launch can only be "not
+    /// running"; a run still holding the task is the blocker even if the
+    /// Mac also slept; otherwise a sleep since the last rebuild explains it.
+    nonisolated static func skipReason(
+        slot: Date,
+        schedulerStartedAt: Date?,
+        previousRunActive: Bool,
+        sleptSinceRebuild: TimeInterval
+    ) -> SkipReason {
+        if let schedulerStartedAt, slot < schedulerStartedAt { return .notRunning }
+        if previousRunActive { return .stillRunning }
+        if sleptSinceRebuild > sleepDetectionThreshold { return .asleep }
+        return .late
+    }
+
+    /// Gives up on `task`'s overdue slot: records it as a `.skipped` log so
+    /// the history shows the gap and why (issue #59), then moves `nextRunAt`
+    /// to the first slot after `now`. Only for tasks without
+    /// `runMissedExecution` — those fire late instead.
+    @discardableResult
+    private func skipMissedRun(
+        _ task: ScheduledTask,
+        dueAt slot: Date,
+        now: Date,
+        in context: ModelContext
+    ) -> Date? {
+        let slept = sleepClockAtRebuild.map { Self.sleepClock() - $0 } ?? 0
+        let reason = Self.skipReason(
+            slot: slot,
+            schedulerStartedAt: startedAt,
+            previousRunActive: runningTaskIDs.contains(task.id) || dueWhileRunningTaskIDs.contains(task.id),
+            sleptSinceRebuild: slept
+        )
+        dueWhileRunningTaskIDs.remove(task.id)
+        NSLog("TaskTick: skipped \(task.name) due \(slot) (\(reason.rawValue))")
+
+        // Not counted in `executionCount`: a skip isn't a run.
+        let log = ExecutionLog(task: task, triggeredBy: .schedule)
+        log.startedAt = slot
+        log.status = .skipped
+        log.skipReason = reason
+        context.insert(log)
+
+        let nextDate = computeNextRunDate(for: task, after: now)
+        task.nextRunAt = nextDate
+        do { try context.save() } catch { NSLog("⚠️ TaskScheduler save failed: \(error)") }
+        return nextDate
     }
 
     /// Fires every enabled task with `runOnLaunch == true` exactly once per
@@ -266,7 +338,14 @@ final class TaskScheduler: ObservableObject {
 
     private func fireTask(_ task: ScheduledTask, triggeredBy: TriggerType = .schedule) {
         let taskId = task.id
-        guard !runningTaskIDs.contains(taskId), let modelContext else { return }
+        guard let modelContext else { return }
+        guard !runningTaskIDs.contains(taskId) else {
+            // The slot stays due and gets retried; if the run outlasts the
+            // on-time window it's skipped, and this is why.
+            if triggeredBy == .schedule { dueWhileRunningTaskIDs.insert(taskId) }
+            return
+        }
+        dueWhileRunningTaskIDs.remove(taskId)
 
         runningTaskIDs.insert(taskId)
 

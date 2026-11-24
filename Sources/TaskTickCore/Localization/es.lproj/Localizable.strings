@@ -173,6 +173,8 @@
 "schedule.until" = "Hasta %@";
 "schedule.after_n_times" = "%d veces";
 "schedule.run_missed" = "Ejecutar ejecución perdida";
+"schedule.missed_section" = "Ejecuciones perdidas";
+"schedule.run_missed.help" = "Si el Mac está en reposo o TaskTick no está abierto cuando toca una ejecución, se ejecuta una vez al reactivarse o al iniciarse. Si está desactivado, se omite";
 "schedule.repeat.cron" = "Expresión cron";
 "schedule.jitter" = "Retraso aleatorio";
 "schedule.jitter.unit" = "s";
@@ -251,6 +253,7 @@
 "status.failure" = "Fallida";
 "status.timeout" = "Tiempo agotado";
 "status.cancelled" = "Cancelada";
+"status.skipped" = "Omitida";
 
 /* Logs */
 "notification.duration" = "Duración:";
@@ -344,6 +347,12 @@
 "log.detail.status" = "Estado";
 "log.detail.timeout_notice" = "Se alcanzó el límite de tiempo (%d segundos) y el script fue terminado";
 "log.detail.timeout_notice_generic" = "El script excedió el tiempo límite y fue terminado";
+"log.skipped.asleep" = "El Mac estaba en reposo cuando tocaba esta ejecución";
+"log.skipped.not_running" = "TaskTick no estaba abierto cuando tocaba esta ejecución";
+"log.skipped.still_running" = "La ejecución anterior seguía en curso cuando tocaba esta";
+"log.skipped.late" = "Esta ejecución no pudo empezar dentro del minuto siguiente a la hora programada";
+"log.skipped.generic" = "Esta ejecución no empezó a la hora programada";
+"log.skipped.hint" = "Activa «%@» en esta tarea para que las ejecuciones perdidas se hagan más tarde en lugar de omitirse";
 "log.detail.sudo_notice" = "sudo requiere una contraseña, pero las tareas en segundo plano no tienen terminal donde introducirla";
 "log.detail.sudo_notice_fix" = "Solución: ejecuta sudo visudo, añade una regla NOPASSWD para el comando y vuelve a ejecutar la tarea";
 "log.close" = "Cerrar";

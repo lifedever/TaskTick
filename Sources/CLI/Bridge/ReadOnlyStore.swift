@@ -63,10 +63,15 @@ final class ReadOnlyStore {
     /// their stdout/stderr live in GUI memory (LiveOutputManager) and aren't
     /// flushed to SwiftData until the run completes — fetching them here
     /// would always return empty strings. Use `tail` for live streaming.
+    /// Also skips `.skipped` entries: they mark a run that never happened,
+    /// so they carry no output, exit code or duration (issue #59).
     func fetchLatestLog(forTaskId taskId: UUID) throws -> ExecutionLog? {
-        let runningRaw = "running"
+        let runningRaw = ExecutionStatus.running.rawValue
+        let skippedRaw = ExecutionStatus.skipped.rawValue
         var descriptor = FetchDescriptor<ExecutionLog>(
-            predicate: #Predicate { $0.task?.id == taskId && $0.statusRaw != runningRaw },
+            predicate: #Predicate {
+                $0.task?.id == taskId && $0.statusRaw != runningRaw && $0.statusRaw != skippedRaw
+            },
             sortBy: [SortDescriptor(\.startedAt, order: .reverse)]
         )
         descriptor.fetchLimit = 1

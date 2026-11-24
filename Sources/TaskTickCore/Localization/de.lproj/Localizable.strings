@@ -173,6 +173,8 @@
 "schedule.until" = "Bis %@";
 "schedule.after_n_times" = "%d Mal";
 "schedule.run_missed" = "Versäumte Ausführung nachholen";
+"schedule.missed_section" = "Versäumte Ausführungen";
+"schedule.run_missed.help" = "Schläft der Mac oder läuft TaskTick nicht, wenn eine Ausführung fällig ist, wird sie nach dem Aufwachen oder Start einmal nachgeholt. Ist die Option aus, wird sie übersprungen";
 "schedule.repeat.cron" = "Cron-Ausdruck";
 "schedule.jitter" = "Zufällige Verzögerung";
 "schedule.jitter.unit" = "Sek.";
@@ -251,6 +253,7 @@
 "status.failure" = "Fehlgeschlagen";
 "status.timeout" = "Zeitüberschreitung";
 "status.cancelled" = "Abgebrochen";
+"status.skipped" = "Übersprungen";
 
 /* Logs */
 "notification.duration" = "Dauer:";
@@ -344,6 +347,12 @@
 "log.detail.status" = "Status";
 "log.detail.timeout_notice" = "Zeitlimit (%d Sekunden) erreicht — das Skript wurde beendet";
 "log.detail.timeout_notice_generic" = "Das Skript hat das Zeitlimit überschritten und wurde beendet";
+"log.skipped.asleep" = "Der Mac war im Ruhezustand, als diese Ausführung fällig war";
+"log.skipped.not_running" = "TaskTick lief nicht, als diese Ausführung fällig war";
+"log.skipped.still_running" = "Die vorherige Ausführung lief noch, als diese fällig war";
+"log.skipped.late" = "Diese Ausführung konnte nicht innerhalb einer Minute nach der geplanten Zeit starten";
+"log.skipped.generic" = "Diese Ausführung startete nicht zur geplanten Zeit";
+"log.skipped.hint" = "Schalte „%@“ für diese Aufgabe ein, um versäumte Ausführungen nachzuholen statt sie zu überspringen";
 "log.detail.sudo_notice" = "sudo benötigt ein Passwort, aber Hintergrundaufgaben haben kein Terminal für die Eingabe";
 "log.detail.sudo_notice_fix" = "Lösung: Führen Sie sudo visudo aus, fügen Sie eine NOPASSWD-Regel für den Befehl hinzu und führen Sie die Aufgabe anschließend erneut aus";
 "log.close" = "Schließen";

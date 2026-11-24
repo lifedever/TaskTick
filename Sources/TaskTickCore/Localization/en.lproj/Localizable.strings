@@ -173,6 +173,8 @@
 "schedule.until" = "Until %@";
 "schedule.after_n_times" = "%d times";
 "schedule.run_missed" = "Run Missed Execution";
+"schedule.missed_section" = "Missed Runs";
+"schedule.run_missed.help" = "If the Mac is asleep or TaskTick isn't running when a run is due, it runs once after wake or launch. When off, it's skipped";
 "schedule.repeat.cron" = "Cron Expression";
 "schedule.jitter" = "Random Jitter";
 "schedule.jitter.unit" = "sec";
@@ -251,6 +253,7 @@
 "status.failure" = "Failed";
 "status.timeout" = "Timed Out";
 "status.cancelled" = "Cancelled";
+"status.skipped" = "Skipped";
 
 /* Logs */
 "notification.duration" = "Duration:";
@@ -344,6 +347,12 @@
 "log.detail.status" = "Status";
 "log.detail.timeout_notice" = "Timed out after reaching the %d-second limit — the script was terminated";
 "log.detail.timeout_notice_generic" = "The script timed out and was terminated";
+"log.skipped.asleep" = "The Mac was asleep when this run was due";
+"log.skipped.not_running" = "TaskTick wasn't running when this run was due";
+"log.skipped.still_running" = "The previous run was still going when this run was due";
+"log.skipped.late" = "This run couldn't start within a minute of its scheduled time";
+"log.skipped.generic" = "This run didn't start at its scheduled time";
+"log.skipped.hint" = "Turn on “%@” for this task to run missed runs late instead of skipping them";
 "log.detail.sudo_notice" = "sudo needs a password, but background tasks have no terminal to type it on";
 "log.detail.sudo_notice_fix" = "Fix: run sudo visudo and add a NOPASSWD rule for the command, then run the task again";
 "log.close" = "Close";
