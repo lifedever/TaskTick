@@ -96,6 +96,18 @@ final class ScriptExecutor: ObservableObject {
         TaskScheduler.shared.runningTaskIDs.insert(task.id)
         defer { TaskScheduler.shared.runningTaskIDs.remove(task.id) }
 
+        // Keep the Mac from idle-sleeping until this run finishes, so a job
+        // that started on time isn't frozen halfway (issue #59). Only runs
+        // with a timeout: unlimited ones (timeoutSeconds <= 0) are dev servers
+        // and watchers meant to stay up for hours, and holding the assertion
+        // for them would stop the Mac from ever sleeping while they're up.
+        // With a timeout the hold is bounded by it — the process is killed at
+        // timeout + 3s.
+        let sleepAssertion = task.timeoutSeconds > 0
+            ? IdleSleepAssertion(name: "TaskTick: running \"\(task.name)\"")
+            : nil
+        defer { sleepAssertion?.release() }
+
         let log = ExecutionLog(task: task, triggeredBy: triggeredBy)
         modelContext.insert(log)
         // Keep this denormalized counter hot-path friendly. The scheduler and UI

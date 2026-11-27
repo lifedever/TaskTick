@@ -1,5 +1,6 @@
 import Testing
 import Foundation
+import IOKit.pwr_mgt
 import SwiftData
 import TaskTickCore
 @testable import TaskTickApp
@@ -276,5 +277,51 @@ struct ScriptExecutorTests {
             out.contains("pid=\(shellPID)"),
             "interpreter should inherit the shell's PID via exec. stdout: \(out)"
         )
+    }
+
+    /// Names of the `PreventUserIdleSystemSleep` assertions this test process
+    /// holds right now, as `pmset -g assertions` would list them.
+    private static func heldIdleSleepAssertionNames() -> [String] {
+        var unmanaged: Unmanaged<CFDictionary>?
+        guard IOPMCopyAssertionsByProcess(&unmanaged) == kIOReturnSuccess,
+              let byPID = unmanaged?.takeRetainedValue() as NSDictionary?,
+              let mine = byPID[NSNumber(value: getpid())] as? [[String: Any]] else { return [] }
+        return mine
+            .filter { ($0[kIOPMAssertionTypeKey] as? String) == kIOPMAssertPreventUserIdleSystemSleep }
+            .compactMap { $0[kIOPMAssertionNameKey] as? String }
+    }
+
+    /// Issue #59: a run that started on time must not be frozen halfway by
+    /// idle sleep. Runs with a timeout hold the assertion until they finish;
+    /// unlimited ones (dev servers, watchers) never take it, or the Mac would
+    /// stay awake for as long as they're up. Matched by the task's unique name
+    /// so other tests running in parallel can't make this pass or fail.
+    @Test("Runs with a timeout hold off idle sleep until they finish; unlimited runs don't", arguments: [
+        (timeoutSeconds: 60, expectHeld: true),
+        (timeoutSeconds: 0, expectHeld: false),
+    ])
+    @MainActor
+    func idleSleepAssertionFollowsRun(timeoutSeconds: Int, expectHeld: Bool) async throws {
+        let schema = Schema([ScheduledTask.self, ExecutionLog.self])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: schema, configurations: [configuration])
+        let context = container.mainContext
+        let name = "sleep-guard-\(UUID().uuidString)"
+        let task = ScheduledTask(name: name, scriptBody: "sleep 1", timeoutSeconds: timeoutSeconds)
+        task.notifyOnSuccess = false
+        task.notifyOnFailure = false
+        context.insert(task)
+        try context.save()
+        let isMine = { (assertion: String) in assertion.contains(name) }
+
+        #expect(!Self.heldIdleSleepAssertionNames().contains(where: isMine))
+        let run = Task { @MainActor in
+            await ScriptExecutor.shared.execute(task: task, modelContext: context).status
+        }
+        try await Task.sleep(for: .milliseconds(400))
+        #expect(Self.heldIdleSleepAssertionNames().contains(where: isMine) == expectHeld)
+
+        #expect(await run.value == .success)
+        #expect(!Self.heldIdleSleepAssertionNames().contains(where: isMine))
     }
 }
