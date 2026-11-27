@@ -17,6 +17,14 @@ struct TaskTickApp: App {
     private(set) static var _needsRecovery = false
 
     init() {
+        // AppKit's 1.5s tooltip delay made the task list's status icons look
+        // like they had no tooltip at all — users move on before it shows.
+        // NSToolTipManager reads this once, when it's created on the first
+        // hover, so it has to be registered before any window is up. The
+        // registration domain is the lowest priority, so a user who set
+        // `defaults write -g NSInitialToolTipDelay` still gets their value.
+        UserDefaults.standard.register(defaults: ["NSInitialToolTipDelay": 500])
+
         let container = Self._sharedModelContainer
         let scheduler = TaskScheduler.shared
         scheduler.configure(modelContext: container.mainContext)
